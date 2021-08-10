@@ -1,2 +1,2 @@
 # TidyMoMan.github.io
-Literally just a website I'm making
+Literally just a website I'm making.
