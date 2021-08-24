@@ -1,0 +1,145 @@
+<html>
+    <head>
+        <title>
+            Click
+        </title>
+    </head>
+    <body>
+            <p>
+                Game State: <dev id="gameState"></dev>
+            </p>
+            <p>
+                Code  Lines Written:  <dev id="number"></dev>
+            </p>
+            <p>
+                Money:  <dev id="money"></dev>
+            </p>
+            <p>
+                Coders:  <dev id="coders"></dev>
+           </p>
+            <button onclick="doStuff()">Make Code</button>
+        <p>
+            <button onclick="coder()">Hire Coder</button>
+        </p>
+        <p>
+            <button onclick="upgradeComputer()">Upgrade Server</button>
+        </p>
+        <p>
+            <button onclick="sellLint()">Sell Pocket Lint</button>
+        </p>
+        <script>
+                var counter = 0;
+                var coderCount = 0;
+                var money = 2500;
+                var moneyBonus = 500;
+                var computerlevel = 0;
+
+                document.getElementById("money").innerHTML = money;
+                document.getElementById("coders").innerHTML = coderCount;
+                document.getElementById("number").innerHTML = counter;    
+
+
+                function coder(){
+                    coderCount++
+                    money = money - 500
+
+                    if(money < -3000){
+                        coderCount = coderCount - 1
+                        money = money + 500}
+
+                document.getElementById("money").innerHTML = money;
+                document.getElementById("coders").innerHTML = coderCount;
+                document.getElementById("number").innerHTML = counter;
+
+                }
+
+                    function upgradeComputer(){
+
+                        computerlevel++
+                        money = money - 1500
+                        if(computerlevel > 3){
+                            coumputerlevel = computerlevel - 1
+                            money = money + 1500
+                        }
+                        
+                        if(money < -3000){
+                            money = money + 1500
+                            coumputerlevel = computerlevel - 1
+                        }
+                document.getElementById("money").innerHTML = money;
+                document.getElementById("coders").innerHTML = coderCount;
+                document.getElementById("number").innerHTML = counter;
+
+                    }
+
+                setInterval(function(){
+                    if(coderCount >= 3 ){
+                    counter = counter + coderCount * .5
+
+                        if(computerlevel > 0){
+                            counter = counter + 5
+                        }
+
+                        if(computerlevel > 1){
+                            counter = counter + 10
+                        }
+
+                        if(computerlevel > 2){
+                            counter = counter + 20
+                        }
+
+                    document.getElementById("number").innerHTML = counter;
+                    }
+
+                    if(money < -1){
+                    document.getElementById("gameState").innerHTML = `${"Crippling debt"}`
+                    document.body.style.backgroundColor = "red";}
+                    else{
+                    document.getElementById("gameState").innerHTML = `${"At least you aren't in the negatives"}`
+                    document.body.style.backgroundColor = "white";
+                    }
+                        
+                    if(counter > moneyBonus){
+                        money = money + 1000
+                        moneyBonus = moneyBonus + 500
+                    }
+                       
+                    if(money > 12000){
+                        document.body.style.backgroundColor = "green"
+                        document.getElementById("gameState").innerHTML = `${"You just win at this point"}`
+                    }
+
+                    if(money > 2500){
+                        document.getElementById("gameState").innerHTML = `${"Doing pretty well for yourself"}`
+                    }
+                    
+
+                document.getElementById("money").innerHTML = money;
+                document.getElementById("coders").innerHTML = coderCount;
+                document.getElementById("number").innerHTML = counter;
+
+                }, 500)
+
+                function sellLint(){
+                        money++
+                    }
+
+                function doStuff(){
+                counter++
+
+                if(computerlevel > 0){
+                counter = counter + 9}
+
+                document.getElementById("money").innerHTML = money;
+                document.getElementById("coders").innerHTML = coderCount;
+                document.getElementById("number").innerHTML = counter;
+                    }
+                
+                
+               
+            
+            
+            
+        </script>
+    </body>
+</html>
