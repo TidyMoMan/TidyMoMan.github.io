@@ -1,145 +1,198 @@
 <html>
-    <head>
-        <title>
-            Click
-        </title>
-    </head>
-    <body>
-            <p>
-                Game State: <dev id="gameState"></dev>
-            </p>
-            <p>
-                Code  Lines Written:  <dev id="number"></dev>
-            </p>
-            <p>
-                Money:  <dev id="money"></dev> (you get 1000 money every 500 code written)
-            </p>
-            <p>
-                Coders:  <dev id="coders"></dev>
-           </p>
-            <button onclick="doStuff()">Make Code</button>
-        <p>
-            <button onclick="coder()">Hire Coder</button>
-        </p>
-        <p>
-            <button onclick="upgradeComputer()">Upgrade Server</button>
-        </p>
-        <p>
-            <button onclick="sellLint()">Sell Pocket Lint</button>
-        </p>
-        <script>
-                var counter = 0;
-                var coderCount = 0;
-                var money = 2500;
-                var moneyBonus = 500;
-                var computerlevel = 0;
 
-                document.getElementById("money").innerHTML = money;
-                document.getElementById("coders").innerHTML = coderCount;
-                document.getElementById("number").innerHTML = counter;    
+<head>
+
+    <style>
+        #popup{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+
+            font-size: 150px;
+
+            color: rgb(255, 255, 255);
+            background-color: #ffffff00;
+
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+    <title>
+        Click
+    </title>
+</head>
 
 
-                function coder(){
-                    coderCount++
-                    money = money - 500
+<body>
+    <p>
+        Game State: <dev id="gameState"></dev>
+    </p>
+    <p>
+        Code Lines Written: <dev id="number"></dev>
+    </p>
+    <p>
+        Money: <dev id="money"></dev>
+    </p>
+    <p>
+        Coders: <dev id="coders"></dev>
+    </p>
+    <button onclick="doStuff()">Make Code</button>
+    <p>
+        <button onclick="coder()">Hire Coder</button>
+    </p>
+    <p>
+        <button onclick="upgradeComputer()">Upgrade Server</button>
+    </p>
+    <p>
+        <button onclick="sellLint()">Sell Pocket Lint</button>
+    </p>
+    <p>
+        <button id="specialbutton" onclick="superserver()" style="display: none">Overclock Server</button>
+    </p>
 
-                    if(money < -3000){
-                        coderCount = coderCount - 1
-                        money = money + 500}
+    <div id="popup">
+        NOPE
+    </div>
 
-                document.getElementById("money").innerHTML = money;
-                document.getElementById("coders").innerHTML = coderCount;
-                document.getElementById("number").innerHTML = counter;
+    <script>
+        var superServer = 0;
+        var counter = 0;
+        var coderCount = 0;
+        var money = 2500;
+        var moneyBonus = 500;
+        var computerlevel = 0;
+        update()
 
+        function superserver(){
+            if(money > 2000){
+                superServer++
+                money = money - 5000
+            }
+            else{
+                popup("not enough money")
+            }
+        }
+
+        function coder() {
+
+            if(money > -3000) {
+                coderCount++
+                money = money - 500
+            }
+            else{
+                popup("no free labor commie")
+            }
+            update()
+        }
+
+        function upgradeComputer() {
+            if (computerlevel <= 3 && money > -1500) {
+                computerlevel++
+                money = money - 1500
+                update()
+            }
+            else{
+                popup("not enough money or server at max tier")
+            }
+            if(computerlevel == 3){
+                document.getElementById("specialbutton").style = "flex"
+
+            }
+        }
+
+        document.body.addEventListener('keypress', function(e) {
+            if(e.key == 'l') {
+                sellLint()
+            }
+        })
+
+        setInterval(function () {
+            if (coderCount >= 3) {
+                counter = counter + coderCount * .5
+
+                if (computerlevel > 0) {
+                    counter = counter + 5
                 }
 
-                    function upgradeComputer(){
+                if (computerlevel > 1) {
+                    counter = counter + 10
+                }
 
-                        computerlevel++
-                        money = money - 1500
-                        if(computerlevel > 3){
-                            coumputerlevel = computerlevel - 1
-                            money = money + 1500
-                        }
-                        
-                        if(money < -3000){
-                            money = money + 1500
-                            coumputerlevel = computerlevel - 1
-                        }
-                document.getElementById("money").innerHTML = money;
-                document.getElementById("coders").innerHTML = coderCount;
+                if (computerlevel > 2) {
+                    counter = counter + 20
+                }
+                if (superServer > 0){
+                    counter = counter + 60
+                }
+
                 document.getElementById("number").innerHTML = counter;
+            }
 
-                    }
+            if (money < -1) {
+                document.getElementById("gameState").innerHTML = "Crippling debt"
+                document.body.style.backgroundColor = "red";
+            }
+            else {
+                document.getElementById("gameState").innerHTML = "At least you aren't in the negatives"
+                document.body.style.backgroundColor = "white";
+            }
 
+            if (money > 12000) {
+                document.body.style.backgroundColor = "green"
+            }
+
+            if (money > 2500) {
+                document.getElementById("gameState").innerHTML = "Doing pretty well for yourself"
+            }
+
+            if (counter > moneyBonus) {
+                money = money + 1000
+                moneyBonus = moneyBonus + 500
+            }
+
+            if(counter > 25000){
+                
+            }
+
+            update()
+        }, 500)
+
+        function sellLint() {
+            money++
+            update()
+        }
+
+        function doStuff() {
+            counter++
+            if(superServer > 0){
+                counter = counter + 50
+            }
+
+            if(computerlevel > 0) {
+                counter = counter + 9
+                update()
+            }
+
+        }
+
+        function update() {
+            document.getElementById("money").innerHTML = money;
+            document.getElementById("coders").innerHTML = coderCount;
+            document.getElementById("number").innerHTML = counter;
+        }
+        function popup(msg){    
+                document.getElementById("popup").innerHTML = msg
+                document.getElementById("popup").style.display = "flex"
                 setInterval(function(){
-                    if(coderCount >= 3 ){
-                    counter = counter + coderCount * .5
+                    document.getElementById("popup").style.display = "none"
 
-                        if(computerlevel > 0){
-                            counter = counter + 5
-                        }
+                },3000)
+            }
 
-                        if(computerlevel > 1){
-                            counter = counter + 10
-                        }
 
-                        if(computerlevel > 2){
-                            counter = counter + 20
-                        }
-
-                    document.getElementById("number").innerHTML = counter;
-                    }
-
-                    if(money < -1){
-                    document.getElementById("gameState").innerHTML = `${"Crippling debt"}`
-                    document.body.style.backgroundColor = "red";}
-                    else{
-                    document.getElementById("gameState").innerHTML = `${"At least you aren't in the negatives"}`
-                    document.body.style.backgroundColor = "white";
-                    }
-                        
-                    if(counter > moneyBonus){
-                        money = money + 1000
-                        moneyBonus = moneyBonus + 500
-                    }
-                       
-                    if(money > 12000){
-                        document.body.style.backgroundColor = "green"
-                        document.getElementById("gameState").innerHTML = `${"You just win at this point"}`
-                    }
-
-                    if(money > 2500){
-                        document.getElementById("gameState").innerHTML = `${"Doing pretty well for yourself"}`
-                    }
-                    
-
-                document.getElementById("money").innerHTML = money;
-                document.getElementById("coders").innerHTML = coderCount;
-                document.getElementById("number").innerHTML = counter;
-
-                }, 500)
-
-                function sellLint(){
-                        money++
-                    }
-
-                function doStuff(){
-                counter++
-
-                if(computerlevel > 0){
-                counter = counter + 9}
-
-                document.getElementById("money").innerHTML = money;
-                document.getElementById("coders").innerHTML = coderCount;
-                document.getElementById("number").innerHTML = counter;
-                    }
-                
-                
-               
-            
-            
-            
-        </script>
-    </body>
+    </script>
+</body>
 </html>
