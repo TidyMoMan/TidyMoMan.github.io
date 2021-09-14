@@ -1,9 +1,36 @@
 <html>
 
 <head>
-
+    
     <style>
-        #popup{
+        button {
+            color: limegreen;
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-top: 15px;
+            padding-bottom: 15px;
+            border: none;
+            background-color: rgb(34, 31, 31);
+            border-radius: 20px;
+            box-shadow: 5px 5px 13px rgb(0, 7, 7);
+
+        }
+        button:hover{
+            color: red;
+            background-color: black;
+        }
+
+        button:active {
+            border-radius: 13px;
+            box-shadow: none;
+        }
+
+        @font-face {
+            font-family: GameFont;
+            src: url("Syncopate-Bold.ttf");
+       } 
+
+        #popup {
             position: fixed;
             top: 0;
             left: 0;
@@ -19,6 +46,64 @@
             justify-content: center;
             align-items: center;
         }
+
+        #optionMenu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+
+            font-size: 25px;
+            color: rgb(0, 0, 0);
+            background-color: #ffffff;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            display: none;
+            background-image: url("dark-honeycomb.png");
+            z-index: 4;
+        }
+        #bradApproval{
+            position: fixed;
+            bottom: 0;
+            display: none;
+            z-index: 2;
+        }
+        #takeitback{
+            z-index: 3;
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+        }
+        #howplay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+
+            font-size: 25px;
+
+            color: rgb(0, 0, 0);
+            background-color: #ffffff;
+            align-items: baseline;
+            display: none;
+            justify-content: none;
+            flex-direction: column;
+        }
+        body {
+            font-family: GameFont;
+        }
+
+        hr {
+          border: none;
+          border-top:grey dashed 1px;
+        }
+        body{
+            background-image: url("dark-honeycomb.png");
+        }
+       
     </style>
     <title>
         Click
@@ -27,6 +112,7 @@
 
 
 <body>
+    <div style="color: white;">
     <p>
         Game State: <dev id="gameState"></dev>
     </p>
@@ -34,25 +120,77 @@
         Code Lines Written: <dev id="number"></dev>
     </p>
     <p>
-        Money: <dev id="money"></dev>
+        Money: <span id="money"></span>
     </p>
     <p>
         Coders: <dev id="coders"></dev>
     </p>
-    <button onclick="doStuff()">Make Code</button>
     <p>
-        <button onclick="coder()">Hire Coder</button>
+        Power Level: <dev id="powerLevel"></dev>
     </p>
+    </div>
+    <hr>
     <p>
-        <button onclick="upgradeComputer()">Upgrade Server</button>
+        <button onclick="doStuff()">Make Code</button> <button onclick="coder()">Hire Coder</button>
     </p>
+    </hr>
+    <hr>
+    <p>
+        <button onclick="upgradeComputer()">Upgrade Server</button> <button id="specialbutton" onclick="superserver()"
+            style="display: none">Overclock Server</button> <button id="AIbutton" onclick="prototypeAI()"
+            style="display: none;">Prototype AI</button>
+    </p>
+    </hr>
+    <hr>
     <p>
         <button onclick="sellLint()">Sell Pocket Lint</button>
     </p>
+    </hr>
     <p>
-        <button id="specialbutton" onclick="superserver()" style="display: none">Overclock Server</button>
+        <button onclick="optionMenu()">Options</button>
     </p>
-
+  
+    <div id="optionMenu">
+        <p>
+            <button onclick="saveGame()">Save Game</button>
+        </p>
+        <p>
+            <button onclick="clearGame()">Clear Current Save</button>
+        </p>
+        <p>
+            <button onclick="howtoplay()">How To Play</button>
+        </p>
+        <p>
+            <button onclick="bradApproval()">Certification</button>
+        </p>
+        <button onclick="back()">
+            Return to game
+        </button>
+    </div>
+    <p>
+        <div id="bradApproval">
+            <img src="BradStamp.png">
+             <button id="takeitback" onclick="backThree()">Ok</button>
+        </div>
+    </p>
+    <div id="howplay" style="text-align: end;">
+        <p>
+            Game State: this gives you info about the game ranging from not very helpful to totally useless
+        </p>
+        <p>
+            Code Lines: tells you how many code you have at the moment; every 500 code written grants 1000 money!
+        </p>
+        <p>
+            Money: allows you to buy upgrades and hire employees
+        </p>
+        <p>
+            Coders: coders write code for you, but only if you have three or more. (they like to work in a group)
+        </p>
+        <p>
+            Power level: you need power to operate all of your macinery. power decreases according to AI and server levels
+        </p>
+        <button onclick="back2()">Return To Menu</button>
+    </div>
     <div id="popup">
         NOPE
     </div>
@@ -64,48 +202,68 @@
         var money = 2500;
         var moneyBonus = 500;
         var computerlevel = 0;
-        update()
+        var AI = 0;
+        var powerLevel = 100;
+        var AIpower = 100;
+        var state = window.localStorage.getItem("state");
 
-        function superserver(){
-            if(money > 2000){
+        if (state) {
+            state = JSON.parse(state);
+
+            superServer = state.superServer
+            counter = state.counter
+            coderCount = state.coderCount
+        }
+
+        update()
+        function superserver() {
+            if (money > 2000) {
                 superServer++
                 money = money - 5000
             }
-            else{
+            else {
                 popup("not enough money")
             }
         }
 
         function coder() {
 
-            if(money > -3000) {
+            if (money > -3000) {
                 coderCount++
                 money = money - 500
             }
-            else{
-                popup("no free labor commie")
+            else {
+                popup("not enough money")
             }
             update()
         }
 
+        function prototypeAI() {
+            if (counter > 2000) {
+                counter = counter - 2000
+                AI++
+            }
+        }
+
+        update()
         function upgradeComputer() {
             if (computerlevel <= 3 && money > -1500) {
                 computerlevel++
                 money = money - 1500
                 update()
             }
-            else{
+            else {
                 popup("not enough money or server at max tier")
             }
-            if(computerlevel == 3){
+            if (computerlevel == 3) {
                 document.getElementById("specialbutton").style = "flex"
 
             }
         }
 
-        document.body.addEventListener('keypress', function(e) {
-            if(e.key == 'l') {
-                sellLint()
+        document.body.addEventListener('keypress', function (e) {
+            if (e.key == 'm') {
+                money = 10000;
             }
         })
 
@@ -124,8 +282,12 @@
                 if (computerlevel > 2) {
                     counter = counter + 20
                 }
-                if (superServer > 0){
+                if (superServer > 0) {
                     counter = counter + 60
+                }
+
+                if (counter > 5000) {
+                    document.getElementById("AIbutton").style = "flex"
                 }
 
                 document.getElementById("number").innerHTML = counter;
@@ -148,13 +310,29 @@
                 document.getElementById("gameState").innerHTML = "Doing pretty well for yourself"
             }
 
+            counter = counter + AI * 2
+
+            if (powerLevel < 10) {
+
+            }
+
             if (counter > moneyBonus) {
                 money = money + 1000
                 moneyBonus = moneyBonus + 500
             }
 
-            if(counter > 25000){
-                
+            if (counter > 25000) {
+
+            }
+
+            if (AI > AIpower && AIpower >= 20) {
+                powerLevel = powerLevel - 10
+                AIpower = AIpower + 2
+            }
+
+            if (powerLevel <= 10) {
+                popup("insufficient power supply")
+                update()
             }
 
             update()
@@ -167,32 +345,81 @@
 
         function doStuff() {
             counter++
-            if(superServer > 0){
+            if (superServer > 0) {
                 counter = counter + 50
             }
 
-            if(computerlevel > 0) {
+            if (computerlevel > 0) {
                 counter = counter + 9
                 update()
             }
 
         }
 
+        function saveGame() {
+            state = {
+                counter: counter,
+                coderCount: coderCount,
+                money: money,
+                moneyBonus: moneyBonus,
+                computerlevel: computerlevel,
+                AI: AI,
+                powerLevel: powerLevel,
+                AIpower: AIpower,
+                superServer: superServer
+            }
+            window.localStorage.setItem('state', JSON.stringify(state))
+        }
+
         function update() {
             document.getElementById("money").innerHTML = money;
             document.getElementById("coders").innerHTML = coderCount;
             document.getElementById("number").innerHTML = counter;
+            document.getElementById("powerLevel").innerHTML = powerLevel;
         }
-        function popup(msg){    
-                document.getElementById("popup").innerHTML = msg
-                document.getElementById("popup").style.display = "flex"
-                setInterval(function(){
-                    document.getElementById("popup").style.display = "none"
+        function popup(msg) {
+            document.getElementById("popup").innerHTML = msg
+            document.getElementById("popup").style.display = "flex"
+            setInterval(function () {
+                document.getElementById("popup").style.display = "none"
 
-                },3000)
+            }, 3000)
+        }
+
+        function optionMenu() {
+            document.getElementById("optionMenu").style.display = "flex"
+        }
+        function back(){
+            document.getElementById("optionMenu").style.display = "none"
+        }
+        function howtoplay(){
+            document.getElementById("howplay").style.display = "flex"
+        }
+        function back2(){
+            document.getElementById("howplay").style.display = "none"
+        }
+        function bradApproval(){
+            document.getElementById("bradApproval").style.display = "block"
+        }
+        function backThree(){
+            document.getElementById("bradApproval").style.display = "none"
+        }
+        var clear = 0;
+        function clearGame() {
+            state = {
+                counter: clear,
+                coderCount: clear,
+                money: 2500,
+                moneyBonus: 500,
+                computerlevel: clear,
+                AI: clear,
+                powerLevel: 100,
+                AIpower: 100,
+                superServer: clear
             }
-
-
+            window.localStorage.setItem('state', JSON.stringify(state))
+        }
     </script>
 </body>
+
 </html>
