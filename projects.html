@@ -39,20 +39,31 @@
         const game = new Phaser.Game(phaserConfig);
         var cursors;
         var ship;
-
+        var bulletCount = 0;
         var invaders;
         var spawnTimer = 5000;
         var bullet;
+        var bomb;
+        var bombCount = 0;
+        var explosion;
+        var lifeCount = 2;
+        var lifeDisplay;
+        var scoreBoard = 0;
+        var ammo;
+        var ammoCount = 45;
+        var ammoSpawn = 20000;
 
         function initScene() { }
         function preloadScene(
         ) {
             this.load.image("background", "/assets/retrospace2.jpg");
-
+            this.load.image("bomb", "/assets/Bomb.png");
             this.load.image("ship", "/assets/retrospaceship.png");
             this.load.image('spark', '/assets/blue-flare.png');
             this.load.image('invader', '/assets/space_invader.png');
             this.load.image('bullet', '/assets/blue-flare.png');
+            this.load.image('explosion', '/assets/explosion.png');
+            this.load.image('ammo', '/assets/santa_hat.png');
 
         }
         function createScene() {
@@ -75,6 +86,7 @@
             //this.physics.overlap(this.brad, this.ship, onWorldBounds);
             //this.physics.world.on('worldbounds', onWorldBounds); needs function 
             //Phaser.Geom.Intersects.RectangleToRectangle(brad, ship)
+
 
             invaders = this.add.group();
 
@@ -107,7 +119,7 @@
 
                 angle: { min: -180, max: 180 },
                 speed: 10,
-                gravityX: -350,
+                gravityX: -550,
                 lifespan: 4000,
                 quantity: 6,
                 scale: { start: 0.1, end: 1 },
@@ -119,18 +131,37 @@
 
             emitter.startFollow(ship);
             this.physics.add.collider(ship, invaders, function () {
-                ship.destroy();
-
-                setTimeout(() => {
-                    console.log("respawn");
-                    ship = game.physics.add.sprite(100, 450, 'ship');
-                }, 2000)
+                ship.setActive(false).setVisible(false);
+                ship.body.enable = false
                 emitter.remove();
-            });
+                setTimeout(() => {
+                    if(lifeCount > 0){
+                    lifeCount = lifeCount - 1;
+                    console.log("respawn");
+                   ship.body.enable = true;
+                   ship.setActive(true).setVisible(true);
+                    ship.x = 50;
+                    ship.y = 350;
+                    }
+                }, 2000)
+              
+            }); 
+            setInterval(()  => {
+                let ammo = this.physics.add.sprite(1280, Phaser.Math.Between(0, 640), 'ammo')
+                this.physics.add.collider(ship, ammo, () =>{ammo.destroy(); ammoCount += 20});
+                ammo.setVelocityX(-500);
+            }, ammoSpawn);
+            this.ammoDisplay = this.add.text(500, 10, ammoCount, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#00ffff' });
+            this.scoreDisplay = this.add.text(1000, 10, scoreBoard, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#ffff00' });
+            this.lifeDisplay = this.add.text(10, 10, lifeCount, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#ff00ff' });
         }
         function updateScene() {
+          
             // game.physics.arcade.collide(ship, brad);
             // game.physics.arcade.collide(ship, brad, youDied);
+            this.lifeDisplay.setText(lifeCount);
+            this.ammoDisplay.setText(ammoCount);
+            this.scoreDisplay.setText(scoreBoard);
 
             background.tilePositionX += .25;
             if (ship.active) {
@@ -155,15 +186,33 @@
                 else {
                     ship.setVelocityY(0);
                 }
-                if (cursors.space.isDown) {  
-                    bullet = this.physics.add.sprite(ship.x + 90, ship.y, 'bullet');
-                    //bullet = this.physics.add.sprite(ship.x +30, ship.y + 62, 'bullet');
+                if (cursors.space.isDown && bombCount == 0) {
+                    bomb = this.physics.add.sprite(ship.x + 90, ship.y, 'bomb');
+                    bomb.setVelocityX(450);
+                    this.physics.add.collider(bomb, invaders, function (bomb, invader) {
+                        invader.emitter.remove(); invader.destroy();   
+                    })
+                   // explosion = this.physics.add.sprite(bomb.x, bomb.y, 'explosion');
+                    bombCount = 1;
+                    ammoCount -= 1;
+
+                    setTimeout(() => {
+                        bombCount = 0;
+                    }, 250);
+                }
+                if (cursors.shift.isDown && bulletCount == 0) {
+                    bullet = this.physics.add.sprite(ship.x + 30, ship.y - 62, 'bullet');
                     bullet.setVelocityX(1000);
-                    this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); }) 
-                    // bullet = this.physics.add.sprite(ship.x +30, ship.y - 62, 'bullet');
-                    // bullet.setVelocityX(1000);
-                    // this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); })
-                   // this.physics.world.on('worldBounds', function(){bullet.destroy(); console.log("bullet removed")})
+                    this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); scoreBoard++;})
+                    bullet = this.physics.add.sprite(ship.x + 30, ship.y + 62, 'bullet');
+                    bullet.setVelocityX(1000);
+                    this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); scoreBoard++; })
+                    this.physics.world.on('worldBounds', function () { bullet.destroy(); console.log("bullet removed") })
+                    bulletCount = 1;
+                    ammoCount -= 1;
+                    setTimeout(() => {
+                        bulletCount = 0;
+                    }, 600);
 
                 }
             }
