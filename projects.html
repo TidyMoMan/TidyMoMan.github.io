@@ -5,11 +5,54 @@
         brad space invaders
     </title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #game{
+            display: none;
+            }
+        #gameDisplay{
+            background-color: black;
+        }
+        #UI{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        button{
+            color: limegreen;
+            background-color: black;
+            border-radius: 10px;
+        }
+        #highscores{
+            display: none;
+        }
+    </style>
 </head>
 
-<body>
-    <div id="game"></div>
+<body id="gameDisplay">
+    <div id="UI">
+    <button onclick=gameStart();>play a game</button>
+    <button onclick=showScores();>local high scores</button>
+    </div>
+    <div id="highScores">
+        *cricket noises
+    </div>
+    <div id="game">
     <script>
+        function showScores(){
+            if($("highScores").css("display" == "flex")){
+                $("highScores").css("display", "none");
+            }
+            else{
+                $("highScores").css("display", "flex");
+            }
+        }
+        function gameStart(){
+            console.log("BEGIN!!")
+            $("startButton").css("display", "none");
+            $("#game").css("display", "flex");    
+        }
 
         const phaserConfig = {
             type: Phaser.AUTO,
@@ -46,7 +89,7 @@
         var bomb;
         var bombCount = 0;
         var explosion;
-        var lifeCount = 2;
+        var lifeCount = 3;
         var lifeDisplay;
         var scoreBoard = 0;
         var ammo;
@@ -134,16 +177,21 @@
                 ship.setActive(false).setVisible(false);
                 ship.body.enable = false
                 emitter.remove();
+                if(lifeCount == 1){
+                    lifeCount = "dead"
+                    ammoCount = 0;
+                    scoreBoard = 0;
+                    
+                }
+                if(lifeCount > 1){
+                lifeCount = lifeCount - 1;
                 setTimeout(() => {
-                    if(lifeCount > 0){
-                    lifeCount = lifeCount - 1;
                     console.log("respawn");
                    ship.body.enable = true;
                    ship.setActive(true).setVisible(true);
                     ship.x = 50;
                     ship.y = 350;
-                    }
-                }, 2000)
+                }, 2000)}
               
             }); 
             setInterval(()  => {
@@ -215,10 +263,14 @@
                     }, 600);
 
                 }
+                // if(cursors.e.isDown){
+                //     scoreBoard += 1000;
+                // }
             }
 
         }
     </script>
+    </div>
 </body>
 
 </html>
