@@ -5,271 +5,317 @@
         brad space invaders
     </title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        #game{
-            display: none;
-            }
-        #gameDisplay{
-            background-color: black;
-        }
-        #UI{
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        button{
-            color: limegreen;
-            background-color: black;
-            border-radius: 10px;
-        }
-        #highscores{
-            display: none;
-        }
-    </style>
 </head>
 
-<body id="gameDisplay">
-    <div id="UI">
-    <button onclick=gameStart();>play a game</button>
-    <button onclick=showScores();>local high scores</button>
-    </div>
-    <div id="highScores">
-        *cricket noises
-    </div>
+<body>
     <div id="game">
-    <script>
-        function showScores(){
-            if($("highScores").css("display" == "flex")){
-                $("highScores").css("display", "none");
-            }
-            else{
-                $("highScores").css("display", "flex");
-            }
-        }
-        function gameStart(){
-            console.log("BEGIN!!")
-            $("startButton").css("display", "none");
-            $("#game").css("display", "flex");    
-        }
+        <script>
+            var scene = new Phaser.Scene("game");
+            const phaserConfig = {
+                type: Phaser.AUTO,
+                parent: "game",
+                width: 1280,
+                height: 720,
+                scale: {
+                    mode: Phaser.Scale.FIT,
 
-        const phaserConfig = {
-            type: Phaser.AUTO,
-            parent: "game",
-            width: 1280,
-            height: 720,
-            scale: {
-                mode: Phaser.Scale.FIT,
+                },
+                physics: {
+                    default: 'arcade',
+                    arcade: {
+                        gravity: {},
+                        debug: false
+                    }
+                },
+                backgroundColor: "#00ff00",
+            };
 
-            },
-            physics: {
-                default: 'arcade',
-                arcade: {
-                    gravity: {},
-                    debug: false
+            const game = new Phaser.Game(phaserConfig);
+
+            var cursors;
+            var ship;
+            var bulletCount = 0;
+            var bigLaserCount;
+            var invaders;
+            var spawnTimer = 5000;
+            var bullet;
+            var bomb;
+            var bombCount = 0;
+            var explosion;
+            var lifeCount = 3;
+            var lifeDisplay;
+            var scoreBoard = 0;
+            var ammo;
+            var ammoCount = "If u die the game will crash"
+            var ammoSpawn = 20000;
+            var invaderTimer;
+            var hatTimer;
+            var bulletTimer;
+            var statusText = "Pause (p)"
+
+            scene.preload = function () {
+                this.load.image("background", "/assets/retrospace2.jpg");
+                this.load.image("bomb", "/assets/Bomb.png");
+                this.load.image("ship", "/assets/retrospaceship.png");
+                this.load.image('spark', '/assets/blue-flare.png');
+                this.load.image('invader', '/assets/space_invader.png');
+                this.load.image('bullet', '/assets/blue-flare.png');
+                this.load.image('explosion', '/assets/explosion.png');
+                this.load.image('ammo', '/assets/santa_hat.png');
+                this.load.audio('pew', '/assets/cannon_charge.mp3');
+                this.load.audio('pew2', '/assets/pew2.mp3')
+                this.load.image('bigLaser', '/assets/lottalasers.png')
+            }
+            scene.create = function () {
+
+                this.scale.displaySize.setAspectRatio(16 / 9);
+                this.scale.refresh();
+
+                cursors = this.input.keyboard.createCursorKeys();
+                background = this.add.tileSprite(640, 200, 1280, 1100, "background");
+
+                ship = this.physics.add.sprite(100, 450, 'ship');
+
+                ship.setCollideWorldBounds(true);
+
+                ship.setBounce(1, 1);
+
+                //brad.body.onWorldBounds = true; //HANDY DANDY
+
+                pew = this.sound.add('pew', { loop: false });
+                pew2 = this.sound.add('pew2', { loop: false });
+
+
+                invaders = this.add.group();
+
+                this.input.keyboard.on('keydown_P', () => {
+                    if (hatTimer.paused) {
+                        this.physics.resume();
+                        hatTimer.paused = false;
+                        invaderTimer.paused = false;
+                        statusText = "Pause (p)"
+                    }
+                    else {
+                        this.physics.pause();
+                        hatTimer.paused = true;
+                        invaderTimer.paused = true;
+                        statusText = "Paused"
+                    }
+                })
+
+                invaderTimer = this.time.addEvent(new Phaser.Time.TimerEvent({
+                    delay: 3000, callback: () => {
+                        let invader = this.physics.add.sprite(1280, Phaser.Math.Between(0, 640), 'invader')
+                        invaders.add(invader);
+                        invader.setCollideWorldBounds(true);
+                        this.physics.add.collider(invader, invaders)
+                        invader.setBounce(1, 1);
+                        invader.setVelocityX(Phaser.Math.Between(75, 300))
+                        invader.setVelocityY(Phaser.Math.Between(75, 300))
+                        var emitter2 = particles.createEmitter({
+
+                            angle: { min: -180, max: 180 },
+                            speed: 10,
+                            gravityX: 0,
+                            lifespan: 400,
+                            quantity: 6,
+                            scale: { start: 0.1, end: 1 },
+                            blendMode: 'ADD'
+                        });
+                        emitter2.startFollow(invader);
+                        // invader.setTarget(this.ship);
+                        invader["emitter"] = emitter2
+
+                    }, loop: true
+                }));
+
+
+
+                this.input.on('pointerdown', () => {
+
+
                 }
-            },
-            backgroundColor: "#5DACD8",
-            scene: {
-                init: initScene,
-                preload: preloadScene,
-                create: createScene,
-                update: updateScene
-            }
-        };
+                    //}, this);
+                );
 
-        const game = new Phaser.Game(phaserConfig);
-        var cursors;
-        var ship;
-        var bulletCount = 0;
-        var invaders;
-        var spawnTimer = 5000;
-        var bullet;
-        var bomb;
-        var bombCount = 0;
-        var explosion;
-        var lifeCount = 3;
-        var lifeDisplay;
-        var scoreBoard = 0;
-        var ammo;
-        var ammoCount = 45;
-        var ammoSpawn = 20000;
+                var particles = this.add.particles('spark');
 
-        function initScene() { }
-        function preloadScene(
-        ) {
-            this.load.image("background", "/assets/retrospace2.jpg");
-            this.load.image("bomb", "/assets/Bomb.png");
-            this.load.image("ship", "/assets/retrospaceship.png");
-            this.load.image('spark', '/assets/blue-flare.png');
-            this.load.image('invader', '/assets/space_invader.png');
-            this.load.image('bullet', '/assets/blue-flare.png');
-            this.load.image('explosion', '/assets/explosion.png');
-            this.load.image('ammo', '/assets/santa_hat.png');
-
-        }
-        function createScene() {
-
-            this.scale.displaySize.setAspectRatio(16 / 8);
-            this.scale.refresh();
-
-            cursors = this.input.keyboard.createCursorKeys();
-            background = this.add.tileSprite(640, 200, 1280, 1000, "background");
-
-            ship = this.physics.add.sprite(100, 450, 'ship');
-            //brad = this.physics.add.sprite(100, 150, 'brad');
-
-            ship.setCollideWorldBounds(true);
-
-            ship.setBounce(1, 1);
-
-            //brad.body.onWorldBounds = true; //HANDY DANDY
-            //this.physics.add.collider(ship, brad)
-            //this.physics.overlap(this.brad, this.ship, onWorldBounds);
-            //this.physics.world.on('worldbounds', onWorldBounds); needs function 
-            //Phaser.Geom.Intersects.RectangleToRectangle(brad, ship)
-
-
-            invaders = this.add.group();
-
-            window.setInterval(() => {
-                let invader = this.physics.add.sprite(1280, Phaser.Math.Between(0, 640), 'invader')
-                invaders.add(invader);
-                invader.setCollideWorldBounds(true);
-                this.physics.add.collider(invader, invaders)
-                invader.setBounce(1, 1);
-                invader.setVelocityX(Phaser.Math.Between(75, 300))
-                invader.setVelocityY(Phaser.Math.Between(75, 300))
-                var emitter2 = particles.createEmitter({
+                var emitter = particles.createEmitter({
 
                     angle: { min: -180, max: 180 },
                     speed: 10,
-                    gravityX: 0,
-                    lifespan: 400,
+                    gravityX: -550,
+                    lifespan: 4000,
                     quantity: 6,
                     scale: { start: 0.1, end: 1 },
                     blendMode: 'ADD'
                 });
-                emitter2.startFollow(invader);
-                // invader.setTarget(this.ship);
-                invader["emitter"] = emitter2
-            }, spawnTimer)
+                var particles2 = this.add.particles('spark');
 
-            var particles = this.add.particles('spark');
+                ship.body.immovable = true;
 
-            var emitter = particles.createEmitter({
+                emitter.startFollow(ship);
+                this.physics.add.collider(ship, invaders, () => {
+                    ship.setActive(false).setVisible(false);
+                    ship.body.enable = false
+                    emitter.remove();
+                    if (lifeCount == 2) {
 
-                angle: { min: -180, max: 180 },
-                speed: 10,
-                gravityX: -550,
-                lifespan: 4000,
-                quantity: 6,
-                scale: { start: 0.1, end: 1 },
-                blendMode: 'ADD'
-            });
-            var particles2 = this.add.particles('spark');
+                        ammoCount = 0;
+                        scoreBoard = 0;
+                        console.log(game);
+                        scene.end();
 
-            ship.body.immovable = true;
+                    }
+                    if (lifeCount > 1) {
+                        lifeCount = lifeCount - 1;
+                        setTimeout(() => {
+                            console.log("respawn");
+                            ship.body.enable = true;
+                            ship.setActive(true).setVisible(true);
+                            ship.x = 50;
+                            ship.y = 350;
+                        }, 2000)
+                    }
 
-            emitter.startFollow(ship);
-            this.physics.add.collider(ship, invaders, function () {
-                ship.setActive(false).setVisible(false);
-                ship.body.enable = false
-                emitter.remove();
-                if(lifeCount == 1){
-                    lifeCount = "dead"
-                    ammoCount = 0;
-                    scoreBoard = 0;
-                    
-                }
-                if(lifeCount > 1){
-                lifeCount = lifeCount - 1;
-                setTimeout(() => {
-                    console.log("respawn");
-                   ship.body.enable = true;
-                   ship.setActive(true).setVisible(true);
-                    ship.x = 50;
-                    ship.y = 350;
-                }, 2000)}
-              
-            }); 
-            setInterval(()  => {
-                let ammo = this.physics.add.sprite(1280, Phaser.Math.Between(0, 640), 'ammo')
-                this.physics.add.collider(ship, ammo, () =>{ammo.destroy(); ammoCount += 20});
-                ammo.setVelocityX(-500);
-            }, ammoSpawn);
-            this.ammoDisplay = this.add.text(500, 10, ammoCount, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#00ffff' });
-            this.scoreDisplay = this.add.text(1000, 10, scoreBoard, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#ffff00' });
-            this.lifeDisplay = this.add.text(10, 10, lifeCount, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#ff00ff' });
-        }
-        function updateScene() {
-          
-            // game.physics.arcade.collide(ship, brad);
-            // game.physics.arcade.collide(ship, brad, youDied);
-            this.lifeDisplay.setText(lifeCount);
-            this.ammoDisplay.setText(ammoCount);
-            this.scoreDisplay.setText(scoreBoard);
+                });
 
-            background.tilePositionX += .25;
-            if (ship.active) {
-                if (cursors.left.isDown) {
-                    ship.setVelocityX(-200);
-                }
-                else if (cursors.right.isDown) {
-                    ship.setVelocityX(400);
-                }
-                else {
-                    ship.setVelocityX(0);
-                }
+                hatTimer = this.time.addEvent(
+                    new Phaser.Time.TimerEvent({
+                        delay: 3000, callback: () => {
+                            let ammo = this.physics.add.sprite(1280, Phaser.Math.Between(0, 640), 'ammo')
+                            this.physics.add.collider(ship, ammo, () => { ammo.destroy(); ammoCount += 20 });
+                            ammo.setVelocityX(-500);
+                        }, loop: true
+                    }));
 
-                if (cursors.up.isDown) {
-                    ship.setVelocityY(-100);
-                }
 
-                else if (cursors.down.isDown) {
-                    ship.setVelocityY(100);
-                    //spawnTimer = 50;
-                }
-                else {
-                    ship.setVelocityY(0);
-                }
-                if (cursors.space.isDown && bombCount == 0) {
-                    bomb = this.physics.add.sprite(ship.x + 90, ship.y, 'bomb');
-                    bomb.setVelocityX(450);
-                    this.physics.add.collider(bomb, invaders, function (bomb, invader) {
-                        invader.emitter.remove(); invader.destroy();   
-                    })
-                   // explosion = this.physics.add.sprite(bomb.x, bomb.y, 'explosion');
-                    bombCount = 1;
-                    ammoCount -= 1;
 
-                    setTimeout(() => {
-                        bombCount = 0;
-                    }, 250);
-                }
-                if (cursors.shift.isDown && bulletCount == 0) {
-                    bullet = this.physics.add.sprite(ship.x + 30, ship.y - 62, 'bullet');
-                    bullet.setVelocityX(1000);
-                    this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); scoreBoard++;})
-                    bullet = this.physics.add.sprite(ship.x + 30, ship.y + 62, 'bullet');
-                    bullet.setVelocityX(1000);
-                    this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); scoreBoard++; })
-                    this.physics.world.on('worldBounds', function () { bullet.destroy(); console.log("bullet removed") })
-                    bulletCount = 1;
-                    ammoCount -= 1;
-                    setTimeout(() => {
-                        bulletCount = 0;
-                    }, 600);
+                this.ammoDisplay = this.add.text(10, 0, ammoCount, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#1f3538' });
+                this.scoreDisplay = this.add.text(10, 100, scoreBoard, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#99ff00' });
+                this.lifeDisplay = this.add.text(10, 200, lifeCount, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#5eff97' });
+                this.statusDisplay = this.add.text(950, 10, statusText, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#e642ff' });
+                //statusTextMessage.setInteractive();
 
-                }
-                // if(cursors.e.isDown){
-                //     scoreBoard += 1000;
-                // }
+
+
+                // hatTimer = this.time.addEvent(
+                //     new Phaser.Time.TimerEvent({
+                //         delay: 3000, callback: () => {
+
+                //         }, loop: true
+                //     }));
+
+
             }
 
-        }
-    </script>
+            scene.update = function () {
+
+                // game.physics.arcade.collide(ship, brad);
+                // game.physics.arcade.collide(ship, brad, youDied);
+                this.lifeDisplay.setText(lifeCount);
+                this.ammoDisplay.setText(ammoCount);
+                this.scoreDisplay.setText(scoreBoard);
+                this.statusDisplay.setText(statusText);
+
+                background.tilePositionX += .25;
+                if (ship.active) {
+                    if (cursors.left.isDown) {
+                        ship.setVelocityX(-200);
+                    }
+                    else if (cursors.right.isDown) {
+                        ship.setVelocityX(400);
+                    }
+                    else {
+                        ship.setVelocityX(0);
+                    }
+
+                    if (cursors.up.isDown) {
+                        ship.setVelocityY(-100);
+                    }
+
+                    else if (cursors.down.isDown) {
+                        ship.setVelocityY(100);
+                        //spawnTimer = 50;
+                    }
+                    else {
+                        ship.setVelocityY(0);
+                    }
+
+                    if (cursors.space.isDown && bombCount == 0) {
+                        bomb = this.physics.add.sprite(ship.x + 90, ship.y, 'bomb');
+                        bomb.setVelocityX(450);
+
+                        this.physics.add.collider(bomb, invaders, function (bomb, invader) {
+                            invader.emitter.remove(); invader.destroy();
+                        })
+                        // explosion = this.physics.add.sprite(bomb.x, bomb.y, 'explosion');
+                        bombCount = 1;
+                        ammoCount -= 1;
+
+                        bombTimer = this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 1500, callback: () => {
+                                    bombCount = 0;
+                                }, loop: false
+                            }));
+                    }
+                    if (cursors.shift.isDown && bulletCount == 0) {
+                        bullet = this.physics.add.sprite(ship.x + 30, ship.y - 62, 'bullet');
+                        bullet.setVelocityX(1000);
+                        this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); scoreBoard++; })
+                        bullet = this.physics.add.sprite(ship.x + 30, ship.y + 62, 'bullet');
+                        bullet.setVelocityX(1000);
+                        pew2.play();
+                        this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); scoreBoard++; })
+                        this.physics.world.on('worldBounds', function () { bullet.destroy(); console.log("bullet removed") })
+                        bulletCount = 1;
+                        ammoCount -= 1;
+                        bulletTimer = this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 600, callback: () => {
+                                    bulletCount = 0;
+                                }, loop: false
+                            }));
+
+                    }
+                    this.input.keyboard.on('keydown_W', function () {
+                        if (ammoCount > 0) {
+                            pew.play();
+                            setTimeout(() => {
+                                bigLaser = this.physics.add.sprite(ship.x + 90, ship.y, 'bigLaser');
+                                this.physics.add.collider(bigLaser, invaders, function (bigLaser, invaders) { invaders.emitter.remove(); invaders.destroy() });
+                                bigLaser.setVelocityX(600);
+                                bigLaser.setVelocityY(Phaser.Math.Between(-500, 500));
+                                ammoCount = 0;
+                                bigLaserCount = 0;
+                                bigLaserCount = 0;
+                            }, 9700);
+                        }
+
+                    }, this);
+
+                }
+
+            }
+
+            scene.end = function () {
+                this.scene.stop();
+                game.scene.start('titleScene');
+            }
+            var titleScreen = new Phaser.Scene("titleScene");
+            titleScreen.preload = function () {
+                this.load.image('background', 'images/retrospace2.png');
+            }
+            titleScreen.create = function () {
+                this.add.image(0, 0, 'background');
+                this.ammoDisplay = this.add.text(500, 10, ammoCount, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#00ffff' });
+            }
+            game.scene.add('titleScreen', titleScreen);
+            game.scene.add("game", scene);
+            game.scene.start('game');
+
+        </script>
     </div>
 </body>
 
