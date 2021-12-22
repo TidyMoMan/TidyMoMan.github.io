@@ -2,7 +2,7 @@
 
 <head>
     <title>
-        brad space invaders
+        spacial intruders
     </title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.min.js"></script>
 </head>
@@ -52,6 +52,7 @@
             var hatTimer;
             var bulletTimer;
             var statusText = "Pause (p)"
+            var backgroundScroll = true;
 
             scene.preload = function () {
                 this.load.image("background", "/assets/retrospace2.jpg");
@@ -93,12 +94,14 @@
                         this.physics.resume();
                         hatTimer.paused = false;
                         invaderTimer.paused = false;
+                        backgroundScroll = true;
                         statusText = "Pause (p)"
                     }
                     else {
                         this.physics.pause();
                         hatTimer.paused = true;
                         invaderTimer.paused = true;
+                        backgroundScroll = false;
                         statusText = "Paused"
                     }
                 })
@@ -217,8 +220,9 @@
                 this.ammoDisplay.setText(ammoCount);
                 this.scoreDisplay.setText(scoreBoard);
                 this.statusDisplay.setText(statusText);
-
-                background.tilePositionX += .25;
+                if (backgroundScroll == true) {
+                    background.tilePositionX += .25;
+                }
                 if (ship.active) {
                     if (cursors.left.isDown) {
                         ship.setVelocityX(-200);
@@ -305,13 +309,48 @@
             }
             var titleScreen = new Phaser.Scene("titleScene");
             titleScreen.preload = function () {
-                this.load.image('background', 'images/retrospace2.png');
+                this.load.image('background2', '/assets/dark-honeycomb.png');
             }
             titleScreen.create = function () {
-                this.add.image(0, 0, 'background');
-                this.ammoDisplay = this.add.text(500, 10, ammoCount, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#00ffff' });
+                console.log("it worked");
+                background = this.add.tileSprite(640, 200, 1280, 1100, "background2");
+
+                const menuButton = this.add.text(540, 520, "main menu", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#ecf542' });
+                menuButton.setInteractive();
+                menuButton.on('pointerdown', ()=> {
+                    console.log('menubuttonwasclicked');
+                    this.scene.stop();
+                    game.scene.start('menuScene');
+                });
+
+                const restartButton = this.add.text(500, 200, "restart?", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#42f2f5' });
+                restartButton.setInteractive();
+                restartButton.on('pointerdown', () => {
+                    console.log('restartbuttonwasclicked');
+                    this.scene.stop();
+                    game.scene.start('game');
+                    lifeCount = 3;
+                    ammoCount = 45;
+                });
+                this.add.text(500, 410, "your score was: " + scoreBoard, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#750606' });
+                this.add.text(500, 10, "you died!", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#ecf542' });
             }
-            game.scene.add('titleScreen', titleScreen);
+            titleScreen.update = function () {
+                background.tilePositionY += .25;
+
+            }
+
+            var menuScreen = new Phaser.Scene("menuScene");
+            menuScreen.create = function(){
+                background = this.add.tileSprite(640, 200, 1280, 1100, "background2");
+                this.add.text(500, 100, "play!", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#ecf542' });
+                this.add.text(500, 10, "how do????", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#ecf542' });
+
+            }
+
+
+            game.scene.add('titleScene', titleScreen);
+            game.scene.add('menuScene', menuScreen);
             game.scene.add("game", scene);
             game.scene.start('game');
 
