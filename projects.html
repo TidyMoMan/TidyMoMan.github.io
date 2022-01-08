@@ -2,12 +2,17 @@
 
 <head>
     <title>
-        spacial intruders
+        brad space invaders
     </title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.min.js"></script>
-</head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
+        
+    </style>
+</head>
 <body>
+
     <div id="game">
         <script>
             var scene = new Phaser.Scene("game");
@@ -29,13 +34,12 @@
                 },
                 backgroundColor: "#00ff00",
             };
-
-            const game = new Phaser.Game(phaserConfig);
+            var movementController = 1;
 
             var cursors;
             var ship;
             var bulletCount = 0;
-            var bigLaserCount;
+            
             var invaders;
             var spawnTimer = 5000;
             var bullet;
@@ -46,13 +50,17 @@
             var lifeDisplay;
             var scoreBoard = 0;
             var ammo;
-            var ammoCount = 45;
+            var ammoCount = 15;
             var ammoSpawn = 20000;
             var invaderTimer;
             var hatTimer;
             var bulletTimer;
             var statusText = "Pause (p)"
             var backgroundScroll = true;
+            
+            const game = new Phaser.Game(phaserConfig);
+
+            
 
             scene.preload = function () {
                 this.load.image("background", "/assets/retrospace2.jpg");
@@ -63,10 +71,10 @@
                 this.load.image('bullet', '/assets/blue-flare.png');
                 this.load.image('explosion', '/assets/explosion.png');
                 this.load.image('ammo', '/assets/santa_hat.png');
+            
                 this.load.audio('pew', '/assets/cannon_charge.mp3');
                 this.load.audio('pew2', '/assets/pew2.mp3')
-                this.load.image('bigLaser', '/assets/lottalasers.png')
-            }
+            }   
             scene.create = function () {
 
                 this.scale.displaySize.setAspectRatio(16 / 9);
@@ -162,11 +170,10 @@
                     ship.setActive(false).setVisible(false);
                     ship.body.enable = false
                     emitter.remove();
-                    if (lifeCount == 2) {
+                    if (lifeCount == 1) {
 
                         ammoCount = 0;
-                        scoreBoard = 0;
-                        console.log(game);
+                        //scoreBoard = 0;
                         scene.end();
 
                     }
@@ -187,7 +194,7 @@
                     new Phaser.Time.TimerEvent({
                         delay: 3000, callback: () => {
                             let ammo = this.physics.add.sprite(1280, Phaser.Math.Between(0, 640), 'ammo')
-                            this.physics.add.collider(ship, ammo, () => { ammo.destroy(); ammoCount += 20 });
+                            this.physics.add.collider(ship, ammo, () => { ammo.destroy(); ammoCount += 5 });
                             ammo.setVelocityX(-500);
                         }, loop: true
                     }));
@@ -246,7 +253,7 @@
                         ship.setVelocityY(0);
                     }
 
-                    if (cursors.space.isDown && bombCount == 0) {
+                    if (cursors.space.isDown && bombCount == 0 && ammoCount > 0) {
                         bomb = this.physics.add.sprite(ship.x + 90, ship.y, 'bomb');
                         bomb.setVelocityX(450);
 
@@ -264,7 +271,7 @@
                                 }, loop: false
                             }));
                     }
-                    if (cursors.shift.isDown && bulletCount == 0) {
+                    if (cursors.shift.isDown && bulletCount == 0 && ammoCount > 0) {
                         bullet = this.physics.add.sprite(ship.x + 30, ship.y - 62, 'bullet');
                         bullet.setVelocityX(1000);
                         this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); scoreBoard++; })
@@ -272,9 +279,9 @@
                         bullet.setVelocityX(1000);
                         pew2.play();
                         this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); scoreBoard++; })
-                        this.physics.world.on('worldBounds', function () { bullet.destroy(); console.log("bullet removed") })
+                        //this.physics.world.on('worldBounds', function () { bullet.destroy(); console.log("bullet removed") })
                         bulletCount = 1;
-                        ammoCount -= 1;
+                        ammoCount -= 2;
                         bulletTimer = this.time.addEvent(
                             new Phaser.Time.TimerEvent({
                                 delay: 600, callback: () => {
@@ -283,21 +290,7 @@
                             }));
 
                     }
-                    this.input.keyboard.on('keydown_W', function () {
-                        if (ammoCount > 0) {
-                            pew.play();
-                            setTimeout(() => {
-                                bigLaser = this.physics.add.sprite(ship.x + 90, ship.y, 'bigLaser');
-                                this.physics.add.collider(bigLaser, invaders, function (bigLaser, invaders) { invaders.emitter.remove(); invaders.destroy() });
-                                bigLaser.setVelocityX(600);
-                                bigLaser.setVelocityY(Phaser.Math.Between(-500, 500));
-                                ammoCount = 0;
-                                bigLaserCount = 0;
-                                bigLaserCount = 0;
-                            }, 9700);
-                        }
-
-                    }, this);
+                   
 
                 }
 
@@ -305,17 +298,20 @@
 
             scene.end = function () {
                 this.scene.stop();
-                game.scene.start('titleScene');
+                game.scene.start('deathScene');
+                
             }
-            var titleScreen = new Phaser.Scene("titleScene");
-            titleScreen.preload = function () {
-                this.load.image('background2', '/assets/dark-honeycomb.png');
+            var deathScreen = new Phaser.Scene("deathScene");
+            deathScreen.preload = function () {
+                this.load.image('background3', '/assets/dark-honeycomb.png');
             }
-            titleScreen.create = function () {
-                console.log("it worked");
-                background = this.add.tileSprite(640, 200, 1280, 1100, "background2");
+            deathScreen.create = function () {
+                const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+                const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
-                const menuButton = this.add.text(540, 520, "main menu", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#ecf542' });
+                background = this.add.tileSprite(640, 200, 1280, 1100, "background3");
+
+                const menuButton = this.add.text(screenCenterX, 520, "main menu", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setOrigin(0.5);
                 menuButton.setInteractive();
                 menuButton.on('pointerdown', ()=> {
                     console.log('menubuttonwasclicked');
@@ -323,36 +319,78 @@
                     game.scene.start('menuScene');
                 });
 
-                const restartButton = this.add.text(500, 200, "restart?", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#42f2f5' });
+                const restartButton = this.add.text(screenCenterX, 200, "restart?", { fontFamily: 'VT323', fontSize: 64, color: '#42f2f5' });
                 restartButton.setInteractive();
                 restartButton.on('pointerdown', () => {
                     console.log('restartbuttonwasclicked');
                     this.scene.stop();
-                    game.scene.start('game');
-                    lifeCount = 3;
-                    ammoCount = 45;
+                    mainGameStart();
+                    
                 });
-                this.add.text(500, 410, "your score was: " + scoreBoard, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#750606' });
-                this.add.text(500, 10, "you died!", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#ecf542' });
+                this.add.text(500, 410, "your score was: " + scoreBoard, { fontFamily: 'VT323', fontSize: 64, color: '#750606' });
+                this.add.text(500, 10, "you died!", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' });
             }
-            titleScreen.update = function () {
+            deathScreen.update = function () {
                 background.tilePositionY += .25;
 
             }
 
             var menuScreen = new Phaser.Scene("menuScene");
-            menuScreen.create = function(){
-                background = this.add.tileSprite(640, 200, 1280, 1100, "background2");
-                this.add.text(500, 100, "play!", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#ecf542' });
-                this.add.text(500, 10, "how do????", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#ecf542' });
-
+            menuScreen.preload = function(){
+                this.load.audio('menuMusic', '/assets/Menu_screen.mp3');
+                this.load.image('background2', '/assets/spacebackground.jpg');
             }
 
+            menuScreen.create = function(){
+                const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+                const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
-            game.scene.add('titleScene', titleScreen);
+                menuMusic = this.sound.add('menuMusic', { loop: true });
+                menuMusic.play();
+
+                background = this.add.tileSprite(640, 200, 1280, 1100, "background2");
+
+                playButton = this.add.text(screenCenterX, 100, "play!", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setOrigin(0.5).setInteractive();
+                playButton.on('pointerdown', () => {
+                    console.log('playbuttonwasclicked');
+                    menuMusic.stop();
+                    this.scene.stop();
+                    mainGameStart();
+                });
+                    
+                this.add.text(screenCenterX, 250, "how do????", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setOrigin(0.5);
+               
+                //this.add.text(screenCenterX, screenCenterY, 'Loading: 0%').setOrigin(0.5);
+                
+                this.add.text(screenCenterX, 700, "credits", { fontFamily: 'VT323', fontSize: 20, color: '#ecf542' }).setOrigin(0.5);;
+                background.tilePositionY += 380;
+                background.tilePositionX += 150;
+
+                //temporary fix
+                setInterval(() => {
+                    movementController *= -1
+                }, 20000);
+            }
+
+            menuScreen.update = function(){
+                //background.tilePositionY += 1;
+                
+                background.tilePositionX += .5 * movementController;
+                
+            }
+
+            game.scene.add('deathScene', deathScreen);
+            //game.scene.add('tutorialScene', tutorialScreen)
             game.scene.add('menuScene', menuScreen);
             game.scene.add("game", scene);
-            game.scene.start('game');
+            game.scene.start('menuScene');
+
+            function mainGameStart(){ 
+                scoreBoard = 0;
+                lifeCount = 3;
+                ammoCount = 15;
+                game.scene.start('game');
+            }
 
         </script>
     </div>
