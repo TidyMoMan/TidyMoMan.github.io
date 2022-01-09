@@ -7,8 +7,6 @@
     <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-
-        
     </style>
 </head>
 <body>
@@ -35,6 +33,7 @@
                 backgroundColor: "#00ff00",
             };
             var movementController = 1;
+            const color = new Phaser.Display.Color()
 
             var cursors;
             var ship;
@@ -179,13 +178,17 @@
                     }
                     if (lifeCount > 1) {
                         lifeCount = lifeCount - 1;
-                        setTimeout(() => {
-                            console.log("respawn");
-                            ship.body.enable = true;
-                            ship.setActive(true).setVisible(true);
-                            ship.x = 50;
-                            ship.y = 350;
-                        }, 2000)
+                        
+                        this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 1500, callback: () => {
+                                    console.log("respawn");
+                                    ship.body.enable = true;
+                                    ship.setActive(true).setVisible(true);
+                                    ship.x = 50;
+                                    ship.y = 350;
+                                }, loop: false
+                            }));
                     }
 
                 });
@@ -201,10 +204,10 @@
 
 
 
-                this.ammoDisplay = this.add.text(10, 0, ammoCount, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#1f3538' });
-                this.scoreDisplay = this.add.text(10, 100, scoreBoard, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#99ff00' });
-                this.lifeDisplay = this.add.text(10, 200, lifeCount, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#5eff97' });
-                this.statusDisplay = this.add.text(950, 10, statusText, { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontSize: 64, color: '#e642ff' });
+                this.ammoDisplay = this.add.text(10, 0, ammoCount, { fontFamily: 'VT323', fontSize: 64, color: '#1f3538' });
+                this.scoreDisplay = this.add.text(10, 100, scoreBoard, { fontFamily: 'VT323', fontSize: 64, color: '#99ff00' });
+                this.lifeDisplay = this.add.text(10, 200, lifeCount, { fontFamily: 'VT323', fontSize: 64, color: '#5eff97' });
+                this.statusDisplay = this.add.text(950, 10, statusText, { fontFamily: 'VT323', fontSize: 64, color: '#e642ff' });
                 //statusTextMessage.setInteractive();
 
 
@@ -350,26 +353,60 @@
 
                 background = this.add.tileSprite(640, 200, 1280, 1100, "background2");
 
-                playButton = this.add.text(screenCenterX, 100, "play!", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setOrigin(0.5).setInteractive();
-                playButton.on('pointerdown', () => {
+                playButton = this.add.text(screenCenterX, 100, "play!", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setOrigin(0.5).setInteractive().on('pointerdown', () => {
                     console.log('playbuttonwasclicked');
                     menuMusic.stop();
                     this.scene.stop();
                     mainGameStart();
                 });
                     
-                this.add.text(screenCenterX, 250, "how do????", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setOrigin(0.5);
+                tutorialButton = this.add.text(screenCenterX, 250, "how do????", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setInteractive().setOrigin(0.5).on('pointerover', () => {
+                    color.random();
+                    tutorialButton.setTint(color.color)
+                }).on('pointerout', () => {
+                    color.random();
+                    tutorialButton.setTint(color.color)
+                });
+
+                optionsButton = this.add.text(screenCenterX, 400, "options", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setOrigin(0.5).setInteractive().on('pointerover', () => {
+                    color.random();
+                    optionsButton.setTint(color.color)
+                }).on('pointerout', () => {
+                    color.random();
+                    optionsButton.setTint(color.color)
+                });
                
                 //this.add.text(screenCenterX, screenCenterY, 'Loading: 0%').setOrigin(0.5);
                 
-                this.add.text(screenCenterX, 700, "credits", { fontFamily: 'VT323', fontSize: 20, color: '#ecf542' }).setOrigin(0.5);;
-                background.tilePositionY += 380;
-                background.tilePositionX += 150;
+                creditsButton = this.add.text(screenCenterX, 650, "credits", { fontFamily: 'VT323', fontSize: 20, color: '#ecf542' }).setOrigin(0.5).setInteractive().on('pointerover', () => {
+                    color.random();
+                    creditsButton.setTint(color.color)
+                }).on('pointerout', () => {
+                    color.random();
+                    creditsButton.setTint(color.color)
+                });
+                
+                this.add.text(screenCenterX, 700, "version 1.5", {fontFamily: 'VT323', fontSize: 20, color: '#ecf542'}).setOrigin(0.5)
 
-                //temporary fix
-                setInterval(() => {
-                    movementController *= -1
-                }, 20000);
+                background.tilePositionY += 380;
+                background.tilePositionX += 270;
+
+                //temporary fix???
+                
+                this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 20000, callback: () => {
+                                    movementController *= -1
+                                }, loop: true
+                            }));
+                
+                this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 200, callback: () => {
+                                    color.random();
+                                    playButton.setTint(color.color);
+                                }, loop: true
+                            }));
             }
 
             menuScreen.update = function(){
