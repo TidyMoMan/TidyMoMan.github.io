@@ -1,115 +1,436 @@
 <html>
 
 <head>
-    <title>Moses' Website</title>
+    <title>
+        brad space invaders
+    </title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Mitr:wght@300;500&family=Pridi:wght@300;600&display=swap');
-        body {
-            color: white;
-            background-image: url('websitebackground.png');
-            font-family: 'Mitr', sans-serif;
-        }
-
-        h1 {
-            font-size: 40px;
-            font-family: 'Pridi', serif;
-        }
-
-        h2 {
-            font-family: 'Pridi', serif;
-            border-bottom: 1px solid green;
-            margin-bottom: 12px;
-            margin-top: 0px;
-            font-size: 30px;
-        }
-
-        p {
-            margin-top: 0;
-        }
-
-        a {
-            color: #81DC56
-        }
-
-        a :hover {
-            color: red;
-        }
-
-        #navbar {
-            display: flex;
-            flex-direction: column;
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            
-            position: fixed;
-        }
-
-        #navbar a {
-            padding: 5px;
-
-            display: inline;
-            display: block;
-            border: 1px solid
-        }
-        #everything{
-            display:flex;
-            flex-direction: column;
-            position: fixed;
-            left: 200px
-
-        }
-        #navbar a:hover {
-            background-color: Green;
-            color: white;
-            border: 1px dashed;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
     </style>
 </head>
-
 <body>
-    <ul id="navbar">
-        <li> <a href "https://tidymoman.github.io/CoolZone">Home</a></li>
-        <li> <a href="https://tidymoman.github.io/projects">My Projects</a></li>
-        <li> <a href="https://tidymoman.github.io/OneWay">About OneWay</a></li>
-        <li> <a href="https://tidymoman.github.io/click">Play a Game</a></li>
-    </ul>
-    <div id="everything">
-    <h1 style="margin-bottom: 0px;">Hello, I'm Moses!</h1>
-    <p class="important">
-        I'm a sophomore interested in a lot of things:
-    </p>
-    <ul id="xxx">
 
-        <li> <a href="https://www.nasa.gov/">Space exploration</a>, <a
-                href="https://store.steampowered.com/app/220200/Kerbal_Space_Program/">Rocketry</a><small> (that one
-                might be a stretch)</small> , and Astrophysics</li>
-        <li>Scientific history</li>
-        <li>Fiddling with my Arduino and building electronics</li>
-        <li>Reading books ("The person who won't read has no advantage over the one who can't read." -Mark Twain)</li>
-        <li>Video games (of course!)</li>
-        <li>I am also part of an amazing <a href="https://www.boilerinvasion.org/">robotics team</a>!</li>
-    </ul>
-    </p>
-    <!-- <P>
-        <h1>Space, machines, and everything.</h1>
-For all of my life, I have always had a facination with large, complex, things. It started with a love for railroads and trains. there was just something about them that was alluring, probably the enormous power of the locomotives, or seeing all those moving parts do their thing with perfect harmony. but it did not last forever. soon, I learned of the atomic world. A microscopic world made of infinitesimaly small peices that all fit together in different ways. this is certainly what sparred my interest in atomic reactions and processes that I still find facinating today. These interest satisfied my curiosity for a while, but something even greater was coming. SPACE!! The final frontier! It was only natural that my facination with the complex and mysterious would eventually lead me to the most intricate system of all time, the wider universe. It was almost like something clicked, something that said "This is it. This is the thing I have to be a part of." From that day onward, I can't get enough knowledge of space. This attachment to space soon led me to begin my learning journey in the field of physics, specificaly what makes the universe tick (at least on a basic scale).
+    <div id="game">
+        <script>
+            var scene = new Phaser.Scene("game");
+            const phaserConfig = {
+                type: Phaser.AUTO,
+                parent: "game",
+                width: 1280,
+                height: 720,
+                scale: {
+                    mode: Phaser.Scale.FIT,
 
-The Engineer Is Engi-here
-as soon as I learned that things could be put together to make something greater, I started doing just that. Legos, tinker-toys, Sticks and rocks, sandcastles, pillow forts, whatever I could get my hands on, I could make something out of. Soon I started taking apart things too, such as windup cars, small clocks, and old electronics I found. the electronic items presented an interesting problem, however. how do they work? there were no obvious moving parts, spare items such as power switches.
-        
-    </p> -->
-    <p>
-        If you want to contact for some reason, please pop me a dm through <a onclick="copyName()">my discord</a>
-        
-    </p>
-    <script>
-        function copyName() {
-  navigator.clipboard.writeText('Meowses#5182');
-        }
-    </script>
-    <p style="color:rgba(0, 0, 0, 0)">
-        you found a secret! here's a <a href="https://discord.gg/5HwfJ3CHKS" style="color:rgba(0, 0, 0, 0)">special link!</a>
-    </p>
-</div>
+                },
+                physics: {
+                    default: 'arcade',
+                    arcade: {
+                        gravity: {},
+                        debug: false
+                    }
+                },
+                backgroundColor: "#00ff00",
+            };
+            var movementController = 1;
+            const color = new Phaser.Display.Color()
+
+            var cursors;
+            var ship;
+            var bulletCount = 0;
+            
+            var invaders;
+            var spawnTimer = 5000;
+            var bullet;
+            var bomb;
+            var bombCount = 0;
+            var explosion;
+            var lifeCount = 3;
+            var lifeDisplay;
+            var scoreBoard = 0;
+            var ammo;
+            var ammoCount = 15;
+            var ammoSpawn = 20000;
+            var invaderTimer;
+            var hatTimer;
+            var bulletTimer;
+            var statusText = "Pause (p)"
+            var backgroundScroll = true;
+            
+            const game = new Phaser.Game(phaserConfig);
+
+            
+
+            scene.preload = function () {
+                this.load.image("background", "/assets/retrospace2.jpg");
+                this.load.image("bomb", "/assets/Bomb.png");
+                this.load.image("ship", "/assets/retrospaceship.png");
+                this.load.image('spark', '/assets/blue-flare.png');
+                this.load.image('invader', '/assets/space_invader.png');
+                this.load.image('bullet', '/assets/blue-flare.png');
+                this.load.image('explosion', '/assets/explosion.png');
+                this.load.image('ammo', '/assets/santa_hat.png');
+            
+                this.load.audio('pew', '/assets/cannon_charge.mp3');
+                this.load.audio('pew2', '/assets/pew2.mp3')
+            }   
+            scene.create = function () {
+
+                this.scale.displaySize.setAspectRatio(16 / 9);
+                this.scale.refresh();
+
+                cursors = this.input.keyboard.createCursorKeys();
+                background = this.add.tileSprite(640, 200, 1280, 1100, "background");
+
+                ship = this.physics.add.sprite(100, 450, 'ship');
+
+                ship.setCollideWorldBounds(true);
+
+                ship.setBounce(1, 1);
+
+                //brad.body.onWorldBounds = true; //HANDY DANDY
+
+                pew = this.sound.add('pew', { loop: false });
+                pew2 = this.sound.add('pew2', { loop: false });
+
+
+                invaders = this.add.group();
+
+                this.input.keyboard.on('keydown_P', () => {
+                    if (hatTimer.paused) {
+                        this.physics.resume();
+                        hatTimer.paused = false;
+                        invaderTimer.paused = false;
+                        backgroundScroll = true;
+                        statusText = "Pause (p)"
+                    }
+                    else {
+                        this.physics.pause();
+                        hatTimer.paused = true;
+                        invaderTimer.paused = true;
+                        backgroundScroll = false;
+                        statusText = "Paused"
+                    }
+                })
+
+                invaderTimer = this.time.addEvent(new Phaser.Time.TimerEvent({
+                    delay: 3000, callback: () => {
+                        let invader = this.physics.add.sprite(1280, Phaser.Math.Between(0, 640), 'invader')
+                        invaders.add(invader);
+                        invader.setCollideWorldBounds(true);
+                        this.physics.add.collider(invader, invaders)
+                        invader.setBounce(1, 1);
+                        invader.setVelocityX(Phaser.Math.Between(75, 300))
+                        invader.setVelocityY(Phaser.Math.Between(75, 300))
+                        var emitter2 = particles.createEmitter({
+
+                            angle: { min: -180, max: 180 },
+                            speed: 10,
+                            gravityX: 0,
+                            lifespan: 400,
+                            quantity: 6,
+                            scale: { start: 0.1, end: 1 },
+                            blendMode: 'ADD'
+                        });
+                        emitter2.startFollow(invader);
+                        // invader.setTarget(this.ship);
+                        invader["emitter"] = emitter2
+
+                    }, loop: true
+                }));
+
+
+
+                this.input.on('pointerdown', () => {
+
+
+                }
+                    //}, this);
+                );
+
+                var particles = this.add.particles('spark');
+
+                var emitter = particles.createEmitter({
+
+                    angle: { min: -180, max: 180 },
+                    speed: 10,
+                    gravityX: -550,
+                    lifespan: 4000,
+                    quantity: 6,
+                    scale: { start: 0.1, end: 1 },
+                    blendMode: 'ADD'
+                });
+                var particles2 = this.add.particles('spark');
+
+                ship.body.immovable = true;
+
+                emitter.startFollow(ship);
+                this.physics.add.collider(ship, invaders, () => {
+                    ship.setActive(false).setVisible(false);
+                    ship.body.enable = false
+                    emitter.remove();
+                    if (lifeCount == 1) {
+
+                        ammoCount = 0;
+                        //scoreBoard = 0;
+                        scene.end();
+
+                    }
+                    if (lifeCount > 1) {
+                        lifeCount = lifeCount - 1;
+                        
+                        this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 1500, callback: () => {
+                                    console.log("respawn");
+                                    ship.body.enable = true;
+                                    ship.setActive(true).setVisible(true);
+                                    ship.x = 50;
+                                    ship.y = 350;
+                                }, loop: false
+                            }));
+                    }
+
+                });
+
+                hatTimer = this.time.addEvent(
+                    new Phaser.Time.TimerEvent({
+                        delay: 3000, callback: () => {
+                            let ammo = this.physics.add.sprite(1280, Phaser.Math.Between(0, 640), 'ammo')
+                            this.physics.add.collider(ship, ammo, () => { ammo.destroy(); ammoCount += 5 });
+                            ammo.setVelocityX(-500);
+                        }, loop: true
+                    }));
+
+
+
+                this.ammoDisplay = this.add.text(10, 0, ammoCount, { fontFamily: 'VT323', fontSize: 64, color: '#1f3538' });
+                this.scoreDisplay = this.add.text(10, 100, scoreBoard, { fontFamily: 'VT323', fontSize: 64, color: '#99ff00' });
+                this.lifeDisplay = this.add.text(10, 200, lifeCount, { fontFamily: 'VT323', fontSize: 64, color: '#5eff97' });
+                this.statusDisplay = this.add.text(950, 10, statusText, { fontFamily: 'VT323', fontSize: 64, color: '#e642ff' });
+                //statusTextMessage.setInteractive();
+
+
+
+                // hatTimer = this.time.addEvent(
+                //     new Phaser.Time.TimerEvent({
+                //         delay: 3000, callback: () => {
+
+                //         }, loop: true
+                //     }));
+
+
+            }
+
+            scene.update = function () {
+
+                // game.physics.arcade.collide(ship, brad);
+                // game.physics.arcade.collide(ship, brad, youDied);
+                this.lifeDisplay.setText(lifeCount);
+                this.ammoDisplay.setText(ammoCount);
+                this.scoreDisplay.setText(scoreBoard);
+                this.statusDisplay.setText(statusText);
+                if (backgroundScroll == true) {
+                    background.tilePositionX += .25;
+                }
+                if (ship.active) {
+                    if (cursors.left.isDown) {
+                        ship.setVelocityX(-200);
+                    }
+                    else if (cursors.right.isDown) {
+                        ship.setVelocityX(400);
+                    }
+                    else {
+                        ship.setVelocityX(0);
+                    }
+
+                    if (cursors.up.isDown) {
+                        ship.setVelocityY(-100);
+                    }
+
+                    else if (cursors.down.isDown) {
+                        ship.setVelocityY(100);
+                        //spawnTimer = 50;
+                    }
+                    else {
+                        ship.setVelocityY(0);
+                    }
+
+                    if (cursors.space.isDown && bombCount == 0 && ammoCount > 0) {
+                        bomb = this.physics.add.sprite(ship.x + 90, ship.y, 'bomb');
+                        bomb.setVelocityX(450);
+
+                        this.physics.add.collider(bomb, invaders, function (bomb, invader) {
+                            invader.emitter.remove(); invader.destroy();
+                        })
+                        // explosion = this.physics.add.sprite(bomb.x, bomb.y, 'explosion');
+                        bombCount = 1;
+                        ammoCount -= 1;
+
+                        bombTimer = this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 1500, callback: () => {
+                                    bombCount = 0;
+                                }, loop: false
+                            }));
+                    }
+                    if (cursors.shift.isDown && bulletCount == 0 && ammoCount > 0) {
+                        bullet = this.physics.add.sprite(ship.x + 30, ship.y - 62, 'bullet');
+                        bullet.setVelocityX(1000);
+                        this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); scoreBoard++; })
+                        bullet = this.physics.add.sprite(ship.x + 30, ship.y + 62, 'bullet');
+                        bullet.setVelocityX(1000);
+                        pew2.play();
+                        this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); scoreBoard++; })
+                        //this.physics.world.on('worldBounds', function () { bullet.destroy(); console.log("bullet removed") })
+                        bulletCount = 1;
+                        ammoCount -= 2;
+                        bulletTimer = this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 600, callback: () => {
+                                    bulletCount = 0;
+                                }, loop: false
+                            }));
+
+                    }
+                   
+
+                }
+
+            }
+
+            scene.end = function () {
+                this.scene.stop();
+                game.scene.start('deathScene');
+                
+            }
+            var deathScreen = new Phaser.Scene("deathScene");
+            deathScreen.preload = function () {
+                this.load.image('background3', '/assets/dark-honeycomb.png');
+            }
+            deathScreen.create = function () {
+                const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+                const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+
+                background = this.add.tileSprite(640, 200, 1280, 1100, "background3");
+
+                const menuButton = this.add.text(screenCenterX, 520, "main menu", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setOrigin(0.5);
+                menuButton.setInteractive();
+                menuButton.on('pointerdown', ()=> {
+                    console.log('menubuttonwasclicked');
+                    this.scene.stop();
+                    game.scene.start('menuScene');
+                });
+
+                const restartButton = this.add.text(screenCenterX, 200, "restart?", { fontFamily: 'VT323', fontSize: 64, color: '#42f2f5' });
+                restartButton.setInteractive();
+                restartButton.on('pointerdown', () => {
+                    console.log('restartbuttonwasclicked');
+                    this.scene.stop();
+                    mainGameStart();
+                    
+                });
+                this.add.text(500, 410, "your score was: " + scoreBoard, { fontFamily: 'VT323', fontSize: 64, color: '#750606' });
+                this.add.text(500, 10, "you died!", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' });
+            }
+            deathScreen.update = function () {
+                background.tilePositionY += .25;
+
+            }
+
+            var menuScreen = new Phaser.Scene("menuScene");
+            menuScreen.preload = function(){
+                this.load.audio('menuMusic', '/assets/Menu_screen.mp3');
+                this.load.image('background2', '/assets/spacebackground.jpg');
+            }
+
+            menuScreen.create = function(){
+                const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+                const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+
+                menuMusic = this.sound.add('menuMusic', { loop: true });
+                menuMusic.play();
+
+                background = this.add.tileSprite(640, 200, 1280, 1100, "background2");
+
+                playButton = this.add.text(screenCenterX, 100, "play!", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setOrigin(0.5).setInteractive().on('pointerdown', () => {
+                    console.log('playbuttonwasclicked');
+                    menuMusic.stop();
+                    this.scene.stop();
+                    mainGameStart();
+                });
+                    
+                tutorialButton = this.add.text(screenCenterX, 250, "how do????", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setInteractive().setOrigin(0.5).on('pointerover', () => {
+                    color.random();
+                    tutorialButton.setTint(color.color)
+                }).on('pointerout', () => {
+                    color.random();
+                    tutorialButton.setTint(color.color)
+                });
+
+                optionsButton = this.add.text(screenCenterX, 400, "options", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setOrigin(0.5).setInteractive().on('pointerover', () => {
+                    color.random();
+                    optionsButton.setTint(color.color)
+                }).on('pointerout', () => {
+                    color.random();
+                    optionsButton.setTint(color.color)
+                });
+               
+                //this.add.text(screenCenterX, screenCenterY, 'Loading: 0%').setOrigin(0.5);
+                
+                creditsButton = this.add.text(screenCenterX, 650, "credits", { fontFamily: 'VT323', fontSize: 20, color: '#ecf542' }).setOrigin(0.5).setInteractive().on('pointerover', () => {
+                    color.random();
+                    creditsButton.setTint(color.color)
+                }).on('pointerout', () => {
+                    color.random();
+                    creditsButton.setTint(color.color)
+                });
+                
+                this.add.text(screenCenterX, 700, "version 1.5", {fontFamily: 'VT323', fontSize: 20, color: '#ecf542'}).setOrigin(0.5)
+
+                background.tilePositionY += 380;
+                background.tilePositionX += 270;
+
+                //temporary fix???
+                
+                this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 20000, callback: () => {
+                                    movementController *= -1
+                                }, loop: true
+                            }));
+                
+                this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 200, callback: () => {
+                                    color.random();
+                                    playButton.setTint(color.color);
+                                }, loop: true
+                            }));
+            }
+
+            menuScreen.update = function(){
+                //background.tilePositionY += 1;
+                
+                background.tilePositionX += .5 * movementController;
+                
+            }
+
+            game.scene.add('deathScene', deathScreen);
+            //game.scene.add('tutorialScene', tutorialScreen)
+            game.scene.add('menuScene', menuScreen);
+            game.scene.add("game", scene);
+            game.scene.start('menuScene');
+
+            function mainGameStart(){ 
+                scoreBoard = 0;
+                lifeCount = 3;
+                ammoCount = 15;
+                game.scene.start('game');
+            }
+
+        </script>
+    </div>
 </body>
+
+</html>
