@@ -9,6 +9,7 @@
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
     </style>
 </head>
+
 <body>
 
     <div id="game">
@@ -34,11 +35,20 @@
             };
             var movementController = 1;
             const color = new Phaser.Display.Color()
+            var saveData = window.localStorage.getItem("saveData");
+
+            if (saveData) {
+            saveData = JSON.parse(saveData);
+            var highScore = saveData.highScore}
+            else{
+                var highScore = 0;
+            }
+        
 
             var cursors;
             var ship;
             var bulletCount = 0;
-            
+
             var invaders;
             var spawnTimer = 5000;
             var bullet;
@@ -56,10 +66,10 @@
             var bulletTimer;
             var statusText = "Pause (p)"
             var backgroundScroll = true;
-            
+
             const game = new Phaser.Game(phaserConfig);
 
-            
+
 
             scene.preload = function () {
                 this.load.image("background", "/assets/retrospace2.jpg");
@@ -70,10 +80,10 @@
                 this.load.image('bullet', '/assets/blue-flare.png');
                 this.load.image('explosion', '/assets/explosion.png');
                 this.load.image('ammo', '/assets/santa_hat.png');
-            
+
                 this.load.audio('pew', '/assets/cannon_charge.mp3');
                 this.load.audio('pew2', '/assets/pew2.mp3')
-            }   
+            }
             scene.create = function () {
 
                 this.scale.displaySize.setAspectRatio(16 / 9);
@@ -139,15 +149,6 @@
                     }, loop: true
                 }));
 
-
-
-                this.input.on('pointerdown', () => {
-
-
-                }
-                    //}, this);
-                );
-
                 var particles = this.add.particles('spark');
 
                 var emitter = particles.createEmitter({
@@ -170,15 +171,29 @@
                     ship.body.enable = false
                     emitter.remove();
                     if (lifeCount == 1) {
-
-                        ammoCount = 0;
-                        //scoreBoard = 0;
+                        highScore = 0;
+                        scoreBoard = highScore + 1; 
+                        if (scoreBoard > highScore) {
+                            function saveScore() {
+                                console.log("highscore" + highScore);
+                                console.log("scoreboard" +scoreBoard);
+                                highScore = scoreBoard;
+                                
+                                console.log("new high score! : " + highScore)
+                                saveData = {
+                                    highScore : highScore
+                                }
+                                window.localStorage.setItem('saveData', JSON.stringify(saveData))
+                            }
+                            
+                        }
+                        
                         scene.end();
 
                     }
                     if (lifeCount > 1) {
                         lifeCount = lifeCount - 1;
-                        
+
                         this.time.addEvent(
                             new Phaser.Time.TimerEvent({
                                 delay: 1500, callback: () => {
@@ -208,8 +223,6 @@
                 this.scoreDisplay = this.add.text(10, 100, scoreBoard, { fontFamily: 'VT323', fontSize: 64, color: '#99ff00' });
                 this.lifeDisplay = this.add.text(10, 200, lifeCount, { fontFamily: 'VT323', fontSize: 64, color: '#5eff97' });
                 this.statusDisplay = this.add.text(950, 10, statusText, { fontFamily: 'VT323', fontSize: 64, color: '#e642ff' });
-                //statusTextMessage.setInteractive();
-
 
 
                 // hatTimer = this.time.addEvent(
@@ -293,7 +306,7 @@
                             }));
 
                     }
-                   
+
 
                 }
 
@@ -302,7 +315,7 @@
             scene.end = function () {
                 this.scene.stop();
                 game.scene.start('deathScene');
-                
+
             }
             var deathScreen = new Phaser.Scene("deathScene");
             deathScreen.preload = function () {
@@ -316,22 +329,24 @@
 
                 const menuButton = this.add.text(screenCenterX, 520, "main menu", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setOrigin(0.5);
                 menuButton.setInteractive();
-                menuButton.on('pointerdown', ()=> {
+                menuButton.on('pointerdown', () => {
                     console.log('menubuttonwasclicked');
                     this.scene.stop();
                     game.scene.start('menuScene');
                 });
 
-                const restartButton = this.add.text(screenCenterX, 200, "restart?", { fontFamily: 'VT323', fontSize: 64, color: '#42f2f5' });
+                const restartButton = this.add.text(screenCenterX, 350, "restart", { fontFamily: 'VT323', fontSize: 64, color: '#42f2f5' }).setOrigin(0.5);
                 restartButton.setInteractive();
                 restartButton.on('pointerdown', () => {
                     console.log('restartbuttonwasclicked');
                     this.scene.stop();
                     mainGameStart();
-                    
+
                 });
-                this.add.text(500, 410, "your score was: " + scoreBoard, { fontFamily: 'VT323', fontSize: 64, color: '#750606' });
-                this.add.text(500, 10, "you died!", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' });
+                this.add.text(screenCenterX, 270, "the high score is: " + highScore, { fontFamily: 'VT323', fontSize: 64, color: '#750606' }).setOrigin(0.5);
+
+                this.add.text(screenCenterX, 200, "your score was: " + scoreBoard, { fontFamily: 'VT323', fontSize: 64, color: '#750606' }).setOrigin(0.5);
+                this.add.text(screenCenterX, 25, "you died!", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setOrigin(0.5);
             }
             deathScreen.update = function () {
                 background.tilePositionY += .25;
@@ -339,12 +354,12 @@
             }
 
             var menuScreen = new Phaser.Scene("menuScene");
-            menuScreen.preload = function(){
+            menuScreen.preload = function () {
                 this.load.audio('menuMusic', '/assets/Menu_screen.mp3');
                 this.load.image('background2', '/assets/spacebackground.jpg');
             }
 
-            menuScreen.create = function(){
+            menuScreen.create = function () {
                 const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
                 const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
@@ -359,7 +374,7 @@
                     this.scene.stop();
                     mainGameStart();
                 });
-                    
+
                 tutorialButton = this.add.text(screenCenterX, 250, "how do????", { fontFamily: 'VT323', fontSize: 64, color: '#ecf542' }).setInteractive().setOrigin(0.5).on('pointerover', () => {
                     color.random();
                     tutorialButton.setTint(color.color)
@@ -375,9 +390,9 @@
                     color.random();
                     optionsButton.setTint(color.color)
                 });
-               
+
                 //this.add.text(screenCenterX, screenCenterY, 'Loading: 0%').setOrigin(0.5);
-                
+
                 creditsButton = this.add.text(screenCenterX, 650, "credits", { fontFamily: 'VT323', fontSize: 20, color: '#ecf542' }).setOrigin(0.5).setInteractive().on('pointerover', () => {
                     color.random();
                     creditsButton.setTint(color.color)
@@ -385,35 +400,35 @@
                     color.random();
                     creditsButton.setTint(color.color)
                 });
-                
-                this.add.text(screenCenterX, 700, "version 1.5", {fontFamily: 'VT323', fontSize: 20, color: '#ecf542'}).setOrigin(0.5)
+
+                this.add.text(screenCenterX, 700, "version 1.5", { fontFamily: 'VT323', fontSize: 20, color: '#ecf542' }).setOrigin(0.5)
 
                 background.tilePositionY += 380;
                 background.tilePositionX += 270;
 
                 //temporary fix???
-                
+
                 this.time.addEvent(
-                            new Phaser.Time.TimerEvent({
-                                delay: 20000, callback: () => {
-                                    movementController *= -1
-                                }, loop: true
-                            }));
-                
+                    new Phaser.Time.TimerEvent({
+                        delay: 20000, callback: () => {
+                            movementController *= -1
+                        }, loop: true
+                    }));
+
                 this.time.addEvent(
-                            new Phaser.Time.TimerEvent({
-                                delay: 200, callback: () => {
-                                    color.random();
-                                    playButton.setTint(color.color);
-                                }, loop: true
-                            }));
+                    new Phaser.Time.TimerEvent({
+                        delay: 200, callback: () => {
+                            color.random();
+                            playButton.setTint(color.color);
+                        }, loop: true
+                    }));
             }
 
-            menuScreen.update = function(){
+            menuScreen.update = function () {
                 //background.tilePositionY += 1;
-                
+
                 background.tilePositionX += .5 * movementController;
-                
+
             }
 
             game.scene.add('deathScene', deathScreen);
@@ -422,7 +437,7 @@
             game.scene.add("game", scene);
             game.scene.start('menuScene');
 
-            function mainGameStart(){ 
+            function mainGameStart() {
                 scoreBoard = 0;
                 lifeCount = 3;
                 ammoCount = 15;
