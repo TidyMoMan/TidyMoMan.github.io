@@ -2,7 +2,7 @@
 
 <head>
     <title>
-        brad space invaders
+        Mo & Brad's space invaders
     </title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.min.js"></script>
     <style>
@@ -38,12 +38,13 @@
             var saveData = window.localStorage.getItem("saveData");
 
             if (saveData) {
-            saveData = JSON.parse(saveData);
-            var highScore = saveData.highScore}
-            else{
+                saveData = JSON.parse(saveData);
+                var highScore = saveData.highScore
+            }
+            else {
                 var highScore = 0;
             }
-        
+            //all the variables
 
             var cursors;
             var ship;
@@ -171,23 +172,15 @@
                     ship.body.enable = false
                     emitter.remove();
                     if (lifeCount == 1) {
-                        highScore = 0;
-                        scoreBoard = highScore + 1; 
+
                         if (scoreBoard > highScore) {
-                            function saveScore() {
-                                console.log("highscore" + highScore);
-                                console.log("scoreboard" +scoreBoard);
-                                highScore = scoreBoard;
-                                
-                                console.log("new high score! : " + highScore)
-                                saveData = {
-                                    highScore : highScore
-                                }
-                                window.localStorage.setItem('saveData', JSON.stringify(saveData))
-                            }
-                            
+
+                            console.log("highscore" + highScore);
+                            console.log("scoreboard" + scoreBoard);
+                            highScore = scoreBoard;
+                            saveFunction();
                         }
-                        
+
                         scene.end();
 
                     }
@@ -436,12 +429,21 @@
             game.scene.add('menuScene', menuScreen);
             game.scene.add("game", scene);
             game.scene.start('menuScene');
+            console.log(high)
 
             function mainGameStart() {
                 scoreBoard = 0;
                 lifeCount = 3;
                 ammoCount = 15;
                 game.scene.start('game');
+            }
+
+            function saveFunction() {
+                saveData = {
+
+                    highScore: highScore
+                }
+                window.localStorage.setItem('saveData', JSON.stringify(saveData))
             }
 
         </script>
