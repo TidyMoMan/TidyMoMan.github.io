@@ -42,6 +42,7 @@
 
             var rectangle;
             var bullet;
+            var circle;
             var game = new Phaser.Game(config);
 
             //var thisIsAGoodPlaceToPutPublicVariables;
@@ -52,43 +53,40 @@
             }
 
             scene.create = function () {
-                // const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-                // const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+                 const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+                 const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
-                // const x = this.scale.width * 0.5
-                // const y = this.scale.height * 0.5
-
-
-                // // red rectangle
-                // var rectangle = this.physics.add.sprite(x, y, 'box');
-
-                // // vector to edge of rectangle
-                // const vec = this.physics.velocityFromAngle(rectangle.angle, 50)
-
-                // // draw a circle to show the position
-                // this.add.circle(x + vec.x, y + vec.y, 10, 0xffffff, 1)
-                // setInterval(() => {
-
-                // }, 30);
+       
                 const x = this.scale.width * 0.5
                 const y = this.scale.height * 0.5
 
                 // red rectangle
-                const rect = this.add.rectangle(x, y, 100, 50, 0xffffff, 1)
+                const rect = this.add.rectangle(x, y, 100, 50, 0xffffff, 1);
 
                 var vec = this.physics.velocityFromAngle(rect.angle, 50);
-                var circle = this.add.circle(x + vec.x, y + vec.y, 10, 0xffffff, 1);
+               
+                const rect2 = this.add.rectangle(x, y, 90, 25, 0xffffff, 1);
+                
+
+                var circle = this.add.circle(x + vec.x, y + vec.y, 10, 0x000000, 1);
+
                 this.add.circle(x + vec.x, y + vec.y, 10, 0xffffff, 1);
 
+              
+                    
                 scene.update = function () {
-                    rect.rotation += 0.01;
+                    rect2.rotation = rect.rotation
+                  
                     vec = this.physics.velocityFromAngle(rect.angle, 50)
+                    rect2.x = vec.x + screenCenterX;
+                    rect2.y = vec.y + screenCenterY;
+
                     circle.x = x + vec.x * 2
                     circle.y = y + vec.y * 2
                     console.log("moved circle");
                     var shotCircle;
                     var cursors = this.input.keyboard.createCursorKeys();
-                    if (cursors.left.isDown) {
+                    if (cursors.space.isDown) {
 
                         this.time.addEvent(
                             new Phaser.Time.TimerEvent({
@@ -112,40 +110,22 @@
                     }
                     
                     
-                    // if(cursors.right.isDown){
-                    //     this.time.addEvent(
-                    //                 new Phaser.Time.TimerEvent({
-                    //                     delay: 30, callback: () => {
-                    //                         rectangle.rotation -= 0.01;
-                    //         const vec = this.physics.velocityFromAngle(rectangle.angle)
-
-                    //         // manually set a 50px magnitude change in x and y (dx, dy)
-                    //         const dx = vec.y * 100
-                    //         const dy = vec.x * 100
-
-                    //                     }, loop: false
-                    //                 }));
-                    //             }
-                    //             if(cursors.space.isDown){
-                    //     this.time.addEvent(
-                    //                 new Phaser.Time.TimerEvent({
-                    //                     delay: 300, callback: () => {
-                    //                         //rectangle.rotation += 0.01;
-                    //         const vec = this.physics.velocityFromAngle(rectangle.angle)
-                    //         this.add.circle(vec.x + screenCenterX, vec.y + screenCenterY, 10, 0xffffff, 1);
-                    //         //this.add.sprite('bullet', vec.x + screenCenterX, vec.y + screenCenterY);
-
-                    //                     }, loop: false
-                    //                 }));
-                    //             } 
-
-                    // this.time.addEvent(
-                    //     new Phaser.Time.TimerEvent({
-                    //         delay: 300, callback : () => {
-
-                    //         }, loop: false
-                    //     })
-                    // );
+                    if(cursors.right.isDown){
+                        this.time.addEvent(
+                                    new Phaser.Time.TimerEvent({
+                                        delay: 30, callback: () => {
+                                            rect.rotation -= .1;
+                                        }, loop: false
+                                    }));
+                                }
+                                if(cursors.left.isDown){
+                        this.time.addEvent(
+                                    new Phaser.Time.TimerEvent({
+                                        delay: 30, callback: () => {
+                                            rect.rotation += .1;
+                                        }, loop: false
+                                    }));
+                                } 
 
 
                 }
