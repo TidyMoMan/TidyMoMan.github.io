@@ -1,0 +1,160 @@
+<html>
+
+<head>
+    <title>
+        phaserBoilerplate
+    </title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.min.js"></script>
+
+</head>
+
+<body>
+
+    <div id="game">
+        <script>
+
+            var scene = new Phaser.Scene("game");
+            var config = {
+                type: Phaser.AUTO,
+                width: 1320,
+                height: 700,
+                type: Phaser.AUTO,
+                parent: 'game',
+                physics: {
+                    default: 'arcade',
+                    arcade: {
+                        //gravity: { y: 300 },
+                        debug: false
+                    }
+                },
+                scale: {
+                    mode: Phaser.Scale.FIT,
+
+                },
+                // scene: { 
+                //     preload: preload,
+                //     create: create,
+                //     update: update
+                // }
+                // OLD WAY OF MANAGING SCENES
+            };
+
+
+            var rectangle;
+            var bullet;
+            var game = new Phaser.Game(config);
+
+            //var thisIsAGoodPlaceToPutPublicVariables;
+
+            scene.preload = function () {
+                this.load.image('bullet', '/assets/Bomb.png');
+                this.load.image('box', '/assets/platform.png');
+            }
+
+            scene.create = function () {
+                // const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+                // const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+
+                // const x = this.scale.width * 0.5
+                // const y = this.scale.height * 0.5
+
+
+                // // red rectangle
+                // var rectangle = this.physics.add.sprite(x, y, 'box');
+
+                // // vector to edge of rectangle
+                // const vec = this.physics.velocityFromAngle(rectangle.angle, 50)
+
+                // // draw a circle to show the position
+                // this.add.circle(x + vec.x, y + vec.y, 10, 0xffffff, 1)
+                // setInterval(() => {
+
+                // }, 30);
+                const x = this.scale.width * 0.5
+                const y = this.scale.height * 0.5
+
+                // red rectangle
+                const rect = this.add.rectangle(x, y, 100, 50, 0xffffff, 1)
+
+                var vec = this.physics.velocityFromAngle(rect.angle, 50);
+                var circle = this.add.circle(x + vec.x, y + vec.y, 10, 0xffffff, 1);
+                this.add.circle(x + vec.x, y + vec.y, 10, 0xffffff, 1);
+
+                scene.update = function () {
+                    rect.rotation += 0.01;
+                    vec = this.physics.velocityFromAngle(rect.angle, 50)
+                    circle.x = x + vec.x * 2
+                    circle.y = y + vec.y * 2
+                    console.log("moved circle");
+                    var shotCircle;
+                    var cursors = this.input.keyboard.createCursorKeys();
+                    if (cursors.left.isDown) {
+
+                        this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 300, callback: () => {
+                                   
+                                    
+                                    var shotCircle = this.add.circle(circle.x + vec.x, circle.y + vec.y, 10, 0xffffff, 1);
+                                    shotVec = this.physics.velocityFromAngle(rect.angle, 50)
+                                    this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 10, callback: () => {
+                                   
+                                 shotCircle.x += shotVec.x * .5;
+                                 shotCircle.y += shotVec.y * .5;
+                                    
+                                }, loop: true
+                            }));
+                    
+                                }, loop: false
+                            }));
+                    }
+                    
+                    
+                    // if(cursors.right.isDown){
+                    //     this.time.addEvent(
+                    //                 new Phaser.Time.TimerEvent({
+                    //                     delay: 30, callback: () => {
+                    //                         rectangle.rotation -= 0.01;
+                    //         const vec = this.physics.velocityFromAngle(rectangle.angle)
+
+                    //         // manually set a 50px magnitude change in x and y (dx, dy)
+                    //         const dx = vec.y * 100
+                    //         const dy = vec.x * 100
+
+                    //                     }, loop: false
+                    //                 }));
+                    //             }
+                    //             if(cursors.space.isDown){
+                    //     this.time.addEvent(
+                    //                 new Phaser.Time.TimerEvent({
+                    //                     delay: 300, callback: () => {
+                    //                         //rectangle.rotation += 0.01;
+                    //         const vec = this.physics.velocityFromAngle(rectangle.angle)
+                    //         this.add.circle(vec.x + screenCenterX, vec.y + screenCenterY, 10, 0xffffff, 1);
+                    //         //this.add.sprite('bullet', vec.x + screenCenterX, vec.y + screenCenterY);
+
+                    //                     }, loop: false
+                    //                 }));
+                    //             } 
+
+                    // this.time.addEvent(
+                    //     new Phaser.Time.TimerEvent({
+                    //         delay: 300, callback : () => {
+
+                    //         }, loop: false
+                    //     })
+                    // );
+
+
+                }
+              
+            }
+            game.scene.add("game", scene);
+            game.scene.start('game');
+        </script>
+    </div>
+</body>
+
+</html>
