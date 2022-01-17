@@ -28,7 +28,7 @@
                     default: 'arcade',
                     arcade: {
                         gravity: {},
-                        debug: false
+                        debug: true
                     }
                 },
                 backgroundColor: "#00ff00",
@@ -50,6 +50,7 @@
             var ship;
             var bulletCount = 0;
 
+            var invadersMk2;
             var invaders;
             var spawnTimer = 5000;
             var bullet;
@@ -70,9 +71,8 @@
 
             const game = new Phaser.Game(phaserConfig);
 
-
-
             scene.preload = function () {
+                this.load.image("strongInvader", "/assets/space_invader_blue.png")
                 this.load.image("background", "/assets/retrospace2.jpg");
                 this.load.image("bomb", "/assets/Bomb.png");
                 this.load.image("ship", "/assets/retrospaceship.png");
@@ -104,6 +104,7 @@
                 pew = this.sound.add('pew', { loop: false });
                 pew2 = this.sound.add('pew2', { loop: false });
 
+                strongInvaders = this.add.group();
 
                 invaders = this.add.group();
 
@@ -150,6 +151,33 @@
                     }, loop: true
                 }));
 
+                strongInvaderTimer = this.time.addEvent(new Phaser.Time.TimerEvent({
+                    delay: 8000, callback: () => {
+                        let strongInvader = this.physics.add.sprite(1280, Phaser.Math.Between(0, 640), 'strongInvader')
+                        strongInvaders.add(strongInvader);
+                        strongInvader.setCollideWorldBounds(true);
+                        this.physics.add.collider(strongInvader, strongInvaders);
+                        this.physics.add.collider(strongInvaders, invaders);
+                        strongInvader.setBounce(1, 1);
+                        strongInvader.setVelocityX(Phaser.Math.Between(75, 300))
+                        strongInvader.setVelocityY(Phaser.Math.Between(75, 300))
+                        var emitter3 = particles.createEmitter({
+
+                            angle: { min: -180, max: 180 },
+                            speed: 10,
+                            gravityX: 0,
+                            lifespan: 400,
+                            quantity: 6,
+                            scale: { start: 0.1, end: 1 },
+                            blendMode: 'ADD'
+                        });
+                        emitter3.startFollow(strongInvader);
+                        // invader.setTarget(this.ship);
+                        strongInvader["emitter"] = emitter3
+
+                    }, loop: true
+                }));
+
                 var particles = this.add.particles('spark');
 
                 var emitter = particles.createEmitter({
@@ -168,10 +196,45 @@
 
                 emitter.startFollow(ship);
                 this.physics.add.collider(ship, invaders, () => {
+                      
+                      ship.setActive(false).setVisible(false);
+                        ship.body.enable = false
+                        emitter.remove();
+                        if (lifeCount == 1) {
+
+                            if (scoreBoard > highScore) {
+
+                                console.log("highscore" + highScore);
+                                console.log("scoreboard" + scoreBoard);
+                                highScore = scoreBoard;
+                                saveFunction();
+                            }
+
+                            scene.end();
+
+                        }
+                        if (lifeCount > 1) {
+                            lifeCount = lifeCount - 1;
+
+                            this.time.addEvent(
+                                new Phaser.Time.TimerEvent({
+                                    delay: 1500, callback: () => {
+                                        console.log("respawn");
+                                        ship.body.enable = true;
+                                        ship.setActive(true).setVisible(true);
+                                        ship.x = 50;
+                                        ship.y = 350;
+                                    }, loop: false
+                                }));
+                        }
+                });
+
+                this.physics.add.collider(ship, strongInvaders, () => {
+                    
                     ship.setActive(false).setVisible(false);
                     ship.body.enable = false
                     emitter.remove();
-                    if (lifeCount == 1) {
+                    if (lifeCount == 1 || lifeCount < 1) {
 
                         if (scoreBoard > highScore) {
 
@@ -185,7 +248,7 @@
 
                     }
                     if (lifeCount > 1) {
-                        lifeCount = lifeCount - 1;
+                        lifeCount = lifeCount - 2;
 
                         this.time.addEvent(
                             new Phaser.Time.TimerEvent({
@@ -198,8 +261,7 @@
                                 }, loop: false
                             }));
                     }
-
-                });
+            });
 
                 hatTimer = this.time.addEvent(
                     new Phaser.Time.TimerEvent({
@@ -283,7 +345,8 @@
                     if (cursors.shift.isDown && bulletCount == 0 && ammoCount > 0) {
                         bullet = this.physics.add.sprite(ship.x + 30, ship.y - 62, 'bullet');
                         bullet.setVelocityX(1000);
-                        this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); scoreBoard++; })
+                        this.physics.add.collider(bullet, strongInvaders, function (bullet, strongInvader) { strongInvader.emitter.remove(); strongInvader.destroy(); scoreBoard++; },console.log("killedbig"));
+                        this.physics.add.collider(bullet, invaders, function (bullet, invader) { invader.emitter.remove(); invader.destroy(); scoreBoard++; });
                         bullet = this.physics.add.sprite(ship.x + 30, ship.y + 62, 'bullet');
                         bullet.setVelocityX(1000);
                         pew2.play();
