@@ -2,14 +2,13 @@
 
 <head>
     <title>
-        phaserBoilerplate
+        
     </title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.min.js"></script>
 
 </head>
 
 <body>
-
     <div id="game">
         <script>
 
@@ -53,10 +52,10 @@
             }
 
             scene.create = function () {
-                 const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-                 const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
+                const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+                const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
-       
+
                 const x = this.scale.width * 0.5
                 const y = this.scale.height * 0.5
 
@@ -64,19 +63,22 @@
                 const rect = this.add.rectangle(x, y, 100, 50, 0xffffff, 1);
 
                 var vec = this.physics.velocityFromAngle(rect.angle, 50);
-               
+
                 const rect2 = this.add.rectangle(x, y, 90, 25, 0xffffff, 1);
-                
 
                 var circle = this.add.circle(x + vec.x, y + vec.y, 10, 0x000000, 1);
 
-                this.add.circle(x + vec.x, y + vec.y, 10, 0xffffff, 1);
+                this.cameras.main.setBounds(0, 0, 1024, 1024);
+    
+   
+    this.cameras.main.setZoom(0.5);
+    this.cameras.main.centerOn(0, 0);
+               
 
-              
-                    
                 scene.update = function () {
+                    
                     rect2.rotation = rect.rotation
-                  
+
                     vec = this.physics.velocityFromAngle(rect.angle, 50)
                     rect2.x = vec.x + screenCenterX;
                     rect2.y = vec.y + screenCenterY;
@@ -91,45 +93,46 @@
                         this.time.addEvent(
                             new Phaser.Time.TimerEvent({
                                 delay: 300, callback: () => {
-                                   
-                                    
+                                    let shotAngle = JSON.parse(JSON.stringify(rect.angle));
+                                    console.log(rect.angle);
                                     var shotCircle = this.add.circle(circle.x + vec.x, circle.y + vec.y, 10, 0xffffff, 1);
-                                    shotVec = this.physics.velocityFromAngle(rect.angle, 50)
-                                    this.time.addEvent(
-                            new Phaser.Time.TimerEvent({
-                                delay: 10, callback: () => {
-                                   
-                                 shotCircle.x += shotVec.x * .5;
-                                 shotCircle.y += shotVec.y * .5;
+                                   // shotVecs = this.add.group();
+                                    let shotVec = this.physics.velocityFromAngle(shotAngle, 50);
                                     
-                                }, loop: true
-                            }));
-                    
+                                    this.time.addEvent(
+                                        new Phaser.Time.TimerEvent({
+                                            delay: 10, callback: () => {
+
+                                                shotCircle.x += shotVec.x * .5;
+                                                shotCircle.y += shotVec.y * .5;
+
+                                            }, loop: true
+                                        }));
+
                                 }, loop: false
                             }));
                     }
-                    
-                    
-                    if(cursors.right.isDown){
-                        this.time.addEvent(
-                                    new Phaser.Time.TimerEvent({
-                                        delay: 30, callback: () => {
-                                            rect.rotation -= .1;
-                                        }, loop: false
-                                    }));
-                                }
-                                if(cursors.left.isDown){
-                        this.time.addEvent(
-                                    new Phaser.Time.TimerEvent({
-                                        delay: 30, callback: () => {
-                                            rect.rotation += .1;
-                                        }, loop: false
-                                    }));
-                                } 
 
+
+                    if (cursors.right.isDown) {
+                        this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 30, callback: () => {
+                                    rect.rotation -= .1;
+                                }, loop: false
+                            }));
+                    }
+                    if (cursors.left.isDown) {
+                        this.time.addEvent(
+                            new Phaser.Time.TimerEvent({
+                                delay: 30, callback: () => {
+                                    rect.rotation += .1;
+                                }, loop: false
+                            }));
+                    }
 
                 }
-              
+
             }
             game.scene.add("game", scene);
             game.scene.start('game');
