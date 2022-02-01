@@ -2,7 +2,7 @@
 
 <head>
     <title>
-        
+        Friendly Fire
     </title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.24.1/dist/phaser.min.js"></script>
 
@@ -30,12 +30,7 @@
                     mode: Phaser.Scale.FIT,
 
                 },
-                // scene: { 
-                //     preload: preload,
-                //     create: create,
-                //     update: update
-                // }
-                // OLD WAY OF MANAGING SCENES
+            
             };
 
 
@@ -55,29 +50,42 @@
                 const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
                 const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
+                // this.cameras.main.centerOn(screenCenterX, screenCenterY);
+                this.cameras.main.setZoom(0.5);
+                // this.cameras.main.centerOn(screenCenterX, screenCenterY);
 
                 const x = this.scale.width * 0.5
                 const y = this.scale.height * 0.5
 
-                // red rectangle
-                const rect = this.add.rectangle(x, y, 100, 50, 0xffffff, 1);
+
+                const rect = this.add.rectangle(x, screenCenterY, 100, 50, 0xffffff, 1);
+                rect.angle = Phaser.Math.Between(0, 360);
 
                 var vec = this.physics.velocityFromAngle(rect.angle, 50);
 
-                const rect2 = this.add.rectangle(x, y, 90, 25, 0xffffff, 1);
+                const rect2 = this.add.rectangle(x, screenCenterY, 90, 25, 0xffffff, 1);
+
+                const p2rect = this.add.rectangle(x + 500, screenCenterY, 100, 50, 0xffffff, 1);
+
+                var p2vec = this.physics.velocityFromAngle(p2rect.angle, 50);
+
+                const p2rect2 = this.add.rectangle(x + 500, screenCenterY, 90, 25, 0xffffff, 1);
+
 
                 var circle = this.add.circle(x + vec.x, y + vec.y, 10, 0x000000, 1);
 
                 this.cameras.main.setBounds(0, 0, 1024, 1024);
-    
-   
-    this.cameras.main.setZoom(0.5);
-    this.cameras.main.centerOn(0, 0);
-               
+
+
+
+
+                shotCircles = this.add.group();
+
 
                 scene.update = function () {
-                    
+
                     rect2.rotation = rect.rotation
+                    p2rect2.rotation = p2rect.rotation
 
                     vec = this.physics.velocityFromAngle(rect.angle, 50)
                     rect2.x = vec.x + screenCenterX;
@@ -95,10 +103,11 @@
                                 delay: 300, callback: () => {
                                     let shotAngle = JSON.parse(JSON.stringify(rect.angle));
                                     console.log(rect.angle);
-                                    var shotCircle = this.add.circle(circle.x + vec.x, circle.y + vec.y, 10, 0xffffff, 1);
-                                   // shotVecs = this.add.group();
-                                    let shotVec = this.physics.velocityFromAngle(shotAngle, 50);
-                                    
+                                    var shotCircle = this.add.circle(circle.x + vec.x + Phaser.Math.Between(-20, 20), circle.y + vec.y + Phaser.Math.Between(-20, 20), 10, 0xffffff, 1);
+                                    shotCircles.add(shotCircle);
+
+                                    let shotVec = this.physics.velocityFromAngle(shotAngle + Phaser.Math.Between(-10, 10), 50);
+
                                     this.time.addEvent(
                                         new Phaser.Time.TimerEvent({
                                             delay: 10, callback: () => {
