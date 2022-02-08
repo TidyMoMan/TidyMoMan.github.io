@@ -53,8 +53,8 @@ var scene = new Phaser.Scene("game");
                 const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
                 // this.cameras.main.centerOn(screenCenterX, screenCenterY);
-                this.cameras.main.setZoom(0.5);
                 // this.cameras.main.centerOn(screenCenterX, screenCenterY);
+                this.cameras.main.setZoom(0.5);
 
                 const x = this.scale.width * 0.5
                 const y = this.scale.height * 0.5
@@ -66,27 +66,32 @@ var scene = new Phaser.Scene("game");
                 var vec = this.physics.velocityFromAngle(rect.angle, 50);
 
                 const rect2 = this.add.rectangle(x, screenCenterY, 90, 25, 0xffffff, 1);
-
                 const p2rect = this.add.rectangle(x + 500, screenCenterY, 100, 50, 0xffffff, 1);
-
                 var p2vec = this.physics.velocityFromAngle(p2rect.angle, 50);
-
                 const p2rect2 = this.add.rectangle(x + 500, screenCenterY, 90, 25, 0xffffff, 1);
-
 
                 var circle = this.add.circle(x + vec.x, y + vec.y, 10, 0x0000ff, 1);
 
+                this.add.rectangle(screenCenterX, screenCenterY, 9000, 8, 0x5f5761, 1);
+                detailBit = this.add.rectangle(rect.x, rect.y, 20, 20, 0x5f5761, 1);
+                
+
                 this.cameras.main.setBounds(0, 0, 1024, 1024);
 
-               // this.input.keyboard.on('keydown_W', this.yourFunction, this);
+                //this.input.keyboard.on('keydown_W', this.yourFunction, this);
 
                 shotCircles = this.add.group();
-
 
                 scene.update = function () {
 
                     rect2.rotation = rect.rotation
                     p2rect2.rotation = p2rect.rotation
+
+                    p2rect.x = rect.x + 300; p2rect.y = rect.y; 
+                    rect2.x = rect.x + 300; p2rect.y = rect.y;
+
+                    detailBit.x = rect.x 
+                    detailBit.y = rect.y
                     
                     directionVec = this.physics.velocityFromAngle(rect.angle, 50);
 
@@ -130,27 +135,30 @@ var scene = new Phaser.Scene("game");
                         this.time.addEvent(
                             new Phaser.Time.TimerEvent({
                                 delay: 30, callback: () => {
-                                    rect.x += directionVec.y * -1;
+                                    rect.x += directionVec.x * .5;
+                                    
                                     //console.log("directionVec" + directionVec.x);
                                 }, loop: false
                             }));
                     }
 
-                    if (cursors.down.isDown) {
-                        this.time.addEvent(
-                            new Phaser.Time.TimerEvent({
-                                delay: 30, callback: () => {
-                                    rect.y += directionVec.x + directionVec.y * -1;
-                                    console.log(directionVec);
+                    // if (cursors.down.isDown) {
+                    //     this.time.addEvent(
+                    //         new Phaser.Time.TimerEvent({
+                    //             delay: 30, callback: () => {
+                    //                 rect.y -= directionVec.x + directionVec.y * -1;
+                    //                 console.log(directionVec.x);
+                    //                 console.log(directionVec.y)
 
-                                }, loop: false
-                            }));
-                    }
+                    //             }, loop: false
+                    //         }));
+                    // }
 
                     if (cursors.right.isDown) {
                         this.time.addEvent(
                             new Phaser.Time.TimerEvent({
                                 delay: 30, callback: () => {
+                                    
                                     rect.rotation -= .1;
                                 }, loop: false
                             }));
