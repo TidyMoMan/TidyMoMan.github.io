@@ -1,37 +1,67 @@
 [
   {
     "id": "proj-1",
-    "title": "Lightning glove",
+    "title": "Lightning Glove / Moose II",
     "date": "2023",
-    "tags": ["Embedded", "Wearable"],
+    "tags": [
+      "Embedded",
+      "Wearable"
+    ],
     "description": "Several high-voltage transformers attached to my hand. What could go wrong?!",
-    "url": "projectPages/zapwatch.html"
-  },
-
-  {
-    "id": "proj-2",
-    "title": "NOAA Groundstation",
-    "date": "2024",
-    "tags": ["Radio"],
-    "description": "A giant, custom QFH antenna that lets me receive images from space.",
     "url": ""
   },
-
+  {
+    "id": "proj-2",
+    "title": "Moose III",
+    "date": "2023",
+    "tags": [
+      "Video",
+      "Embedded"
+    ],
+    "description": "Raspi-based portable computer cyberdeck thing. The subject of my first YouTube video!",
+    "url": "https://www.youtube.com/watch?v=ggLHQ34fSus"
+  },
   {
     "id": "proj-3",
-    "title": "Solid Rocket Motor, Part 1",
-    "date": "2025",
-    "tags": ["Video"],
-    "description": "Small-scale solid rocket motor that uses a custom fuel mixture.",
-    "url": "https://www.youtube.com/watch?v=UErmd1vexoo"
+    "title": "NOAA Groundstation",
+    "date": "2024",
+    "tags": [
+      "Radio"
+    ],
+    "description": "A big ol' QFH antenna that lets me receive images from space using an SDR",
+    "url": ""
   },
-
   {
     "id": "proj-4",
+    "title": "Solid Rocket Motor, Part 1",
+    "date": "2025",
+    "tags": [
+      "Video"
+    ],
+    "description": "Small-scale solid rocket motor that uses my custom fuel mixture.",
+    "url": "https://www.youtube.com/watch?v=UErmd1vexoo"
+  },
+  {
+    "id": "proj-5",
     "title": "Solid Rocket Motor, Part 2",
     "date": "2025",
-    "tags": ["Video", "Machining", "Explodey"],
-    "description": "Evaluating (and blowing up) the rocket motor on a test stand",
+    "tags": [
+      "Video",
+      "Machining",
+      "Explodey"
+    ],
+    "description": "Evaluating (and blowing up) the rocket motor on a test stand. Also, building the rest of the rocket.",
     "url": "https://www.youtube.com/watch?v=J2Q4QKLUyMc"
-  } 
+  },
+  {
+    "id": "proj-6",
+    "title": "Pump Battery Pack",
+    "date": "2026",
+    "tags": [
+      "High Power",
+      "PSP Project"
+    ],
+    "description": "A HUGE battery that powers the fuel and ox pump on a liquid rocket.",
+    "url": ""
+  }
 ]
