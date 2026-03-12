@@ -1,0 +1,37 @@
+[
+  {
+    "id": "proj-1",
+    "title": "Lightning glove",
+    "date": "2023",
+    "tags": ["Embedded", "Wearable"],
+    "description": "Several high-voltage transformers attached to my hand. What could go wrong?!",
+    "url": "projectPages/zapwatch.html"
+  },
+
+  {
+    "id": "proj-2",
+    "title": "NOAA Groundstation",
+    "date": "2024",
+    "tags": ["Radio"],
+    "description": "A giant, custom QFH antenna that lets me receive images from space.",
+    "url": ""
+  },
+
+  {
+    "id": "proj-3",
+    "title": "Solid Rocket Motor, Part 1",
+    "date": "2025",
+    "tags": ["Video"],
+    "description": "Small-scale solid rocket motor that uses a custom fuel mixture.",
+    "url": "https://www.youtube.com/watch?v=UErmd1vexoo"
+  },
+
+  {
+    "id": "proj-4",
+    "title": "Solid Rocket Motor, Part 2",
+    "date": "2025",
+    "tags": ["Video", "Machining", "Explodey"],
+    "description": "Evaluating (and blowing up) the rocket motor on a test stand",
+    "url": "https://www.youtube.com/watch?v=J2Q4QKLUyMc"
+  } 
+]
