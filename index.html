@@ -1,77 +1,82 @@
 <!doctype html>
 <html lang="en" class="h-100" data-bs-theme="auto">
-  <head><script src="../assets/js/color-modes.js"></script>
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="Moses Dilts">
-    <meta name="generator" content="Hugo 0.118.2">
-    <title>Moses Dilts Dot Com</title>
+<head>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="Moses Dilts">
+  <meta name="generator" content="Hugo 0.118.2">
+  <title>Moses Dilts Dot Com</title>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="components/styling/styles.css">
-    <link href="components/styling/cover.css" rel="stylesheet">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sixtyfour&display=swap" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-  </head>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+  <link rel="stylesheet" href="components/styling/styles.css">
+  <link href="components/styling/cover.css" rel="stylesheet">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sixtyfour&display=swap" rel="stylesheet">
+
+</head>
 
 
-  <div
-  class="class="bg-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5),
+<div class="class=" bg-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5),
   rgba(0, 0, 0, 0.5)), url('components/images/homepagebackground.png'); height: 100vh; background-size: cover; background-repeat: no-repeat; background-position: center;  box-shadow: inset 0 0 100px #000;
   ">
   </body>
-  
-    
-<div style="color:#ffffff"; class="align-items-center d-flex w-200 h-100 p-3 mx-auto flex-column">
 
 
-  <header class="mb-auto">
-    <div>
-      <nav class="nav nav-masthead justify-content-center float-md-end">
-        <a class="nav-link fw-bold py-1 px-0 active" aria-current="page" href="index.html">Home</a>
-        <a class="nav-link fw-bold py-1 px-0" href="projects.html">Projects</a>
-        <a class="nav-link fw-bold py-1 px-0" href="about.html">About</a>
-      </nav>
-    </div>
-  </header>
-
-    <font id="typed" style="font-family: 'Sixtyfour', sans-serif;" size="+10"></font>
+  <div style="color:#ffffff" ; class="align-items-center d-flex w-200 h-100 p-3 mx-auto flex-column">
 
 
-  <footer class="mt-auto text-white-50">
-    <p>Helical antenna for my satellite ground station</p>
-  </footer>
-  
+    <header class="mb-auto">
+      <div>
+        <nav class="nav nav-masthead justify-content-center float-md-end">
+          <a class="nav-link fw-bold py-1 px-0 active" aria-current="page" href="index.html">Home</a>
+          <a class="nav-link fw-bold py-1 px-0" href="projects.html">Projects</a>
+          <a class="nav-link fw-bold py-1 px-0" href="about.html">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <div id="typed" style="font-family: 'Sixtyfour', sans-serif; align-items: center; font-size: 8vw;"></div>
+
+
+    <footer class="mt-auto text-white-50">
+      <p>Background: QFH Antenna</p>
+    </footer>
+
+  </div>
 </div>
-</div>
-    </body>
+</body>
 
 <script>
 
-var i = 0;
-var id = "typed";
-var txt = 'I\'m Moses.';
-var speed = 75;
+  /*now less stupid!!!!*/
+  const element = document.getElementById('typed');
+  const targetText = "I'm Moses";
+  const timeout = 75; /*ms*/
+  var initialText = '';
+  let currentIndex = 0;
 
-function typeWriter() {
-
-  if (i < txt.length) {
-    document.getElementById(id).innerHTML += txt.charAt(i);
-    i++;
-    setTimeout(typeWriter, speed);
+  for (let v = 0; v < targetText.length; v++) {
+    initialText += Math.trunc(Math.random(9) * 10);
   }
-}
-window.onload = typeWriter();
+
+  const typeInterval = setInterval(() => {
+
+    let display = targetText.slice(0, currentIndex) + initialText.slice(currentIndex, initialText.length);
+    element.textContent = display;
+
+    currentIndex++;
+  }, timeout);
+
 </script>
 
 </html>
